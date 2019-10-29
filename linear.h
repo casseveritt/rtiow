@@ -45,8 +45,7 @@
 
 // Author:  Cass W. Everitt
 
-#ifndef __R3_LINEAR_H__
-#define __R3_LINEAR_H__
+#pragma once
 
 //#include <memory.h>
 #include <algorithm>
@@ -2458,4 +2457,3 @@ typedef Matrix4<double> Matrix4d;
 
 } // namespace r3
 
-#endif
