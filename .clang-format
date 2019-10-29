@@ -10,3 +10,7 @@ PointerAlignment: Left
 BreakBeforeBraces: Allman
 UseTab: Always
 TabWidth: 4
+SpacesInParentheses: true
+SpacesInSquareBrackets: true
+ColumnLimit: 130
+AllowShortFunctionsOnASingleLine: Empty
