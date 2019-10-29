@@ -16,54 +16,49 @@ Vec3f EnvColorFromRay( const Ray& ray )
 }
 
 template <typename T>
-struct Polynomial
+struct Quadratic
 {
-	Polynomial( int degree, const T * coef )
-	{
-		Init( degree, coef );
-	}
-
-	Polynomial( const T a, const T b )
-	{
-		deg = 1;
-		T coef[] = { a, b };
-		Init( 2, coef );
-	}
-
-	Polynomial( const T a, const T b, const T c )
-	{
-		deg = 1;
-		T coef[] = { a, b, c };
-		Init( 2, coef );
-	}
-
-	void Init( int degree, const T * coef )
-	{
-		deg = std::min( degree, 15 );
-		for ( int i = 0; i < 16; i++ )
-		{
-			co[ i ] = i <= deg ? coef[ i ] : 0;
-		}
-	}
-
-	int deg;
 	union
 	{
 		struct
 		{
-			T a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+			T a, b, c;
 		};
-		T co[16];
+		T co[3];
 	};
 
+	Quadratic( T a_, T b_, T c_ )
+	{
+		a = a_;
+		b = b_;
+		c = c_;
+	}
+
+	T Discriminant() const
+	{
+		return b * b - 4 * a * c;
+	}
+
+	T LesserSolution( T discr )
+	{
+		if ( discr < 0 )
+		{
+			return -1;
+		}
+		return ( -b - sqrt( discr ) ) / ( T( 2 ) * a );
+	}
+
+	T GreaterSolution( T discr )
+	{
+		if ( discr < 0 )
+		{
+			return;
+		}
+		return ( -b + sqrt( discr ) ) / ( T( 2 ) * a );
+	}
 };
 
-typedef Polynomial<float> Polynomialf;
-
-float Discriminant( const Polynomialf & pol )
-{
-	return pol.b * pol.b - 4 * pol.a * pol.c;
-}
+typedef Quadratic<float> Quadraticf;
 
 struct Sphere
 {
@@ -71,11 +66,11 @@ struct Sphere
 
 	float Hits( const Ray& ray )
 	{
-		Polynomialf pol( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
-		float discr = Discriminant( pol );
+		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
+		float discr = quadr.Discriminant();
 		if ( discr >= 0 )
 		{
-			return -pol.b - sqrt( discr ) / ( 2 * pol.a );
+			return quadr.LesserSolution( discr );
 		}
 		else
 		{
