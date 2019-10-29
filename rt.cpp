@@ -18,10 +18,48 @@ Vec3f EnvColorFromRay( const Ray& ray )
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
 
-float Discriminant( float* co )
+template <typename T> struct Quadratic
 {
-	return co[ 1 ] * co[ 1 ] - 4 * co[ 0 ] * co[ 2 ];
-}
+	union {
+		struct
+		{
+			T a, b, c;
+		};
+		T co[ 3 ];
+	};
+
+	Quadratic( T a_, T b_, T c_ )
+	{
+		a = a_;
+		b = b_;
+		c = c_;
+	}
+
+	T Discriminant() const
+	{
+		return b * b - 4 * a * c;
+	}
+
+	T LesserSolution( T discr )
+	{
+		if ( discr < 0 )
+		{
+			return -1;
+		}
+		return ( -b - sqrt( discr ) ) / ( T( 2 ) * a );
+	}
+
+	T GreaterSolution( T discr )
+	{
+		if ( discr < 0 )
+		{
+			return;
+		}
+		return ( -b + sqrt( discr ) ) / ( T( 2 ) * a );
+	}
+};
+
+typedef Quadratic<float> Quadraticf;
 
 struct Sphere
 {
@@ -29,11 +67,11 @@ struct Sphere
 
 	float Hits( const Ray& ray )
 	{
-		float co[ 3 ] = {Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r};
-		float discr = Discriminant( co );
+		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
+		float discr = quadr.Discriminant();
 		if ( discr >= 0 )
 		{
-			return -co[ 1 ] - sqrt( discr ) / ( 2 * co[ 0 ] );
+			return quadr.LesserSolution( discr );
 		}
 		else
 		{
