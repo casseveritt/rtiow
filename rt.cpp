@@ -15,16 +15,14 @@ Vec3f EnvColorFromRay( const Ray& ray )
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
 
-template <typename T>
-struct Quadratic
+template <typename T> struct Quadratic
 {
-	union
-	{
+	union {
 		struct
 		{
 			T a, b, c;
 		};
-		T co[3];
+		T co[ 3 ];
 	};
 
 	Quadratic( T a_, T b_, T c_ )
