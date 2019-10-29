@@ -4,7 +4,7 @@ all: rt
 
 
 rt: rt.cpp
-	g++ -std=c++11 rt.cpp -o rt
+	g++ -g -std=c++11 rt.cpp -o rt
 
 
 clean:
