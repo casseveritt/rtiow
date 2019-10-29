@@ -27,11 +27,18 @@ struct Sphere
 {
 	Sphere( const Vec3f& center, const float radius ) : c( center ), r( radius ) {}
 
-	bool Hits( const Ray& ray )
+	float Hits( const Ray& ray )
 	{
-		float coeffs[ 3 ] = {Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r};
-		float discr = Discriminant( coeffs );
-		return discr >= 0;
+		float co[ 3 ] = {Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r};
+		float discr = Discriminant( co );
+		if ( discr >= 0 )
+		{
+			return -co[ 1 ] - sqrt( discr ) / ( 2 * co[ 0 ] );
+		}
+		else
+		{
+			return -1;
+		}
 	}
 
 	Vec3f c;
@@ -59,7 +66,14 @@ int main( int argc, char** argv )
 		{
 			Vec3f coord( i + 0.5f, ( h - 1 ) - j + 0.5f, 0 );
 			Ray ray( origin, coord * scale + bias );
-			Vec3f col = sphere.Hits( ray ) ? Vec3f( 1, 0, 0 ) : EnvColorFromRay( ray );
+			Vec3f col = EnvColorFromRay( ray );
+			float t = sphere.Hits( ray );
+			if ( t > 0 )
+			{
+				Vec3f hit = ray.At( t );
+				Vec3f n = ( hit - sphere.c ).Normalized();
+				col = n * 0.5f + 0.5f;
+			}
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
 			img[ idx + 1 ] = int( 255 * col.y + 0.5f );
