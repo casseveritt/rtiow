@@ -35,14 +35,12 @@ template <typename T> struct Quadratic
 		{
 			return ( -b - std::sqrt( discr ) ) / ( T( 2 ) * a );
 		}
-		else if ( b  < rt_discr )
+		else if ( b < rt_discr )
 		{
 			return ( -b + std::sqrt( discr ) ) / ( T( 2 ) * a );
 		}
 		return -1;
 	}
-
 };
 
 typedef Quadratic<float> Quadraticf;
-

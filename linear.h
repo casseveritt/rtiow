@@ -2456,4 +2456,3 @@ typedef Matrix4<float> Matrix4f;
 typedef Matrix4<double> Matrix4d;
 
 } // namespace r3
-

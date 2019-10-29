@@ -8,7 +8,7 @@ struct Sphere : public Hitable
 	typedef r3::Vec3f V;
 	Sphere( const V& center, const float radius ) : c( center ), r( radius ) {}
 
-	bool Hits( const Ray & ray, float t_min, float t_max, Hit * hit )
+	bool Hits( const Ray& ray, float t_min, float t_max, Hit* hit )
 	{
 		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
 		float discr = quadr.Discriminant();
@@ -39,4 +39,3 @@ struct Sphere : public Hitable
 	V c;
 	float r;
 };
-

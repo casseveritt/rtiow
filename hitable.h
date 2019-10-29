@@ -15,19 +15,18 @@ struct Hit
 
 struct Hitable
 {
-	virtual bool Hits( const Ray & ray, float t_min, float t_max, Hit * hit ) = 0;
+	virtual bool Hits( const Ray& ray, float t_min, float t_max, Hit* hit ) = 0;
 };
-
 
 struct HitableCollection : public Hitable
 {
-	std::vector<Hitable *> hitables;
+	std::vector<Hitable*> hitables;
 
-	bool Hits( const Ray & ray, float t_min, float t_max, Hit * hit )
+	bool Hits( const Ray& ray, float t_min, float t_max, Hit* hit )
 	{
 		bool has_hit = false;
 		Hit closest_hit;
-		for( auto hitable : hitables )
+		for ( auto hitable : hitables )
 		{
 			Hit h;
 			if ( hitable->Hits( ray, t_min, t_max, &h ) )
@@ -50,5 +49,4 @@ struct HitableCollection : public Hitable
 		}
 		return has_hit;
 	}
-
 };
