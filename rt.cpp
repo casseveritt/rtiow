@@ -15,9 +15,54 @@ Vec3f EnvColorFromRay( const Ray& ray )
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
 
-float Discriminant( float* co )
+template <typename T>
+struct Polynomial
 {
-	return co[ 1 ] * co[ 1 ] - 4 * co[ 0 ] * co[ 2 ];
+	Polynomial( int degree, const T * coef )
+	{
+		Init( degree, coef );
+	}
+
+	Polynomial( const T a, const T b )
+	{
+		deg = 1;
+		T coef[] = { a, b };
+		Init( 2, coef );
+	}
+
+	Polynomial( const T a, const T b, const T c )
+	{
+		deg = 1;
+		T coef[] = { a, b, c };
+		Init( 2, coef );
+	}
+
+	void Init( int degree, const T * coef )
+	{
+		deg = std::min( degree, 15 );
+		for ( int i = 0; i < 16; i++ )
+		{
+			co[ i ] = i <= deg ? coef[ i ] : 0;
+		}
+	}
+
+	int deg;
+	union
+	{
+		struct
+		{
+			T a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p;
+		};
+		T co[16];
+	};
+
+};
+
+typedef Polynomial<float> Polynomialf;
+
+float Discriminant( const Polynomialf & pol )
+{
+	return pol.b * pol.b - 4 * pol.a * pol.c;
 }
 
 struct Sphere
@@ -26,11 +71,11 @@ struct Sphere
 
 	float Hits( const Ray& ray )
 	{
-		float co[ 3 ] = {Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r};
-		float discr = Discriminant( co );
+		Polynomialf pol( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
+		float discr = Discriminant( pol );
 		if ( discr >= 0 )
 		{
-			return -co[ 1 ] - sqrt( discr ) / ( 2 * co[ 0 ] );
+			return -pol.b - sqrt( discr ) / ( 2 * pol.a );
 		}
 		else
 		{
