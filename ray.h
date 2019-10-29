@@ -1,3 +1,5 @@
+#pragma once
+
 #include "linear.h"
 
 struct Ray

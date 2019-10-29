@@ -1,5 +1,8 @@
-#include "linear.h"
-#include "ray.h"
+
+
+#include "hitable.h"
+#include "sphere.h"
+
 #include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -17,71 +20,6 @@ Vec3f EnvColorFromRay( const Ray& ray )
 	// printf( "t = %.2f\n", t );
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
-
-template <typename T> struct Quadratic
-{
-	union {
-		struct
-		{
-			T a, b, c;
-		};
-		T co[ 3 ];
-	};
-
-	Quadratic( T a_, T b_, T c_ )
-	{
-		a = a_;
-		b = b_;
-		c = c_;
-	}
-
-	T Discriminant() const
-	{
-		return b * b - 4 * a * c;
-	}
-
-	T LesserSolution( T discr )
-	{
-		if ( discr < 0 )
-		{
-			return -1;
-		}
-		return ( -b - sqrt( discr ) ) / ( T( 2 ) * a );
-	}
-
-	T GreaterSolution( T discr )
-	{
-		if ( discr < 0 )
-		{
-			return;
-		}
-		return ( -b + sqrt( discr ) ) / ( T( 2 ) * a );
-	}
-};
-
-typedef Quadratic<float> Quadraticf;
-
-struct Sphere
-{
-	Sphere( const Vec3f& center, const float radius ) : c( center ), r( radius ) {}
-
-	float Hits( const Ray& ray )
-	{
-		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
-		float discr = quadr.Discriminant();
-		if ( discr >= 0 )
-		{
-			return quadr.LesserSolution( discr );
-		}
-		else
-		{
-			return -1;
-		}
-	}
-
-	Vec3f c;
-	float r;
-};
 
 } // namespace
 
@@ -105,12 +43,10 @@ int main( int argc, char** argv )
 			Vec3f coord( i + 0.5f, ( h - 1 ) - j + 0.5f, 0 );
 			Ray ray( origin, coord * scale + bias );
 			Vec3f col = EnvColorFromRay( ray );
-			float t = sphere.Hits( ray );
-			if ( t > 0 )
+			Hit hit;
+			if ( sphere.Hits( ray, 0, 1000, &hit ) )
 			{
-				Vec3f hit = ray.At( t );
-				Vec3f n = ( hit - sphere.c ).Normalized();
-				col = n * 0.5f + 0.5f;
+				col = hit.n * 0.5f + 0.5f;
 			}
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
