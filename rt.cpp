@@ -2,10 +2,9 @@
 
 #include "camera.h"
 #include "sphere.h"
-#include "env.h"
 
-#include <random>
 #include <limits>
+#include <random>
 #include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -20,6 +19,40 @@ Vec3f EnvColor( const Vec3f& dir )
 	return r3::Lerp( Vec3f( 1, 1, 1 ), Vec3f( 0.5f, 0.7f, 1.0f ), t );
 }
 
+struct RandomPointInUnitSphere
+{
+	RandomPointInUnitSphere() : gen( 0 ), dis( -1.0, 1.0 ) {}
+
+	Vec3f GetPoint()
+	{
+		Vec3f p( dis( gen ), dis( gen ), dis( gen ) );
+		while ( p.LengthSquared() > 1.0f )
+		{
+			p = Vec3f( dis( gen ), dis( gen ), dis( gen ) );
+		}
+		return p;
+	}
+
+	std::mt19937 gen;
+	std::uniform_real_distribution<> dis;
+};
+
+RandomPointInUnitSphere rpius;
+
+Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
+{
+	Hit hit;
+	if ( hitable->Hits( ray, 0, 1000, &hit ) )
+	{
+		Ray new_ray( hit.p, hit.n + rpius.GetPoint() );
+		return 0.5f * ColorFromRay( new_ray, hitable );
+	}
+	else
+	{
+		return EnvColor( ray.dir );
+	}
+}
+
 int main( int argc, char** argv )
 {
 
@@ -31,11 +64,9 @@ int main( int argc, char** argv )
 
 	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5 );
 	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100 );
-	Env env;
 	HitableCollection collection;
 	collection.hitables.push_back( &sphere );
 	collection.hitables.push_back( &sphere2 );
-	collection.hitables.push_back( &env );
 
 	Camera cam( 90 /* fovy degrees */, 2 /* aspect ratio */ );
 
@@ -58,17 +89,7 @@ int main( int argc, char** argv )
 			for ( int k = 0; k < samples; k++ )
 			{
 				Ray ray = cam.GetRay( uv + off[ k ] );
-				Hit hit;
-				// We don't check hits, because env will always hit
-				collection.Hits( ray, 0, 1000, &hit );
-				if ( hit.t < std::numeric_limits<float>::max() )
-				{
-					col += hit.n * 0.5f + 0.5f;
-				}
-				else
-				{
-					col += EnvColor( ray.dir );
-				}
+				col += ColorFromRay( ray, &collection );
 			}
 			col /= samples;
 			int idx = ( j * w + i ) * 3;

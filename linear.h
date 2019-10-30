@@ -397,7 +397,7 @@ template <typename T> class Vec3
 		return T( sqrt( r ) );
 	}
 
-	T SquareNorm() const
+	T LengthSquared() const
 	{
 		T r = 0;
 		for ( int i = 0; i < N; i++ )
