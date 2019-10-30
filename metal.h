@@ -3,17 +3,27 @@
 #include "material.h"
 #include <random>
 
-struct Lambertian : public Material
+struct Metal : public Material
 {
 	typedef r3::Vec3f V;
 
-	Lambertian( const V& albdo ) : albedo( albdo ) {}
+	Metal( const V& albdo, float fuzziness ) : albedo( albdo ), fuzz( fuzziness ) {}
+
+	static inline V Reflect( const V& incident, const V& normal )
+	{
+		return incident - 2 * incident.Dot( normal ) * normal;
+	}
 
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
-		scattered = Ray( hit.p, hit.n + rpius.GetPoint() );
-		attenuation = albedo;
-		return true;
+		V refl = Reflect( incident.dir.Normalized(), hit.n ) + rpius.GetPoint() * fuzz;
+		if ( refl.Dot( hit.n ) > 0 )
+		{
+			scattered = Ray( hit.p, refl );
+			attenuation = albedo;
+			return true;
+		}
+		return false;
 	}
 
 	struct RandomPointInUnitSphere
@@ -35,5 +45,7 @@ struct Lambertian : public Material
 	};
 
 	mutable RandomPointInUnitSphere rpius;
+
 	V albedo;
+	float fuzz;
 };
