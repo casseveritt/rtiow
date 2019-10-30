@@ -1,6 +1,7 @@
 
 
 #include "camera.h"
+#include "dielectric.h"
 #include "lambertian.h"
 #include "metal.h"
 #include "sphere.h"
@@ -10,7 +11,7 @@
 #include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include <stb_image_write.h>
 
 using namespace r3;
 
@@ -30,25 +31,34 @@ struct TraceResult
 	Vec3f Color;
 };
 
-TraceResult TraceRay( const Ray& ray, Hitable* hitable )
+TraceResult TraceRay( const Vec3f& attenuation, const Ray& ray, Hitable* hitable )
 {
+	// if "fully" attenuated, give up
+	if ( attenuation.Dot( attenuation ) < 0.001 )
+	{
+		return TraceResult( Vec3f( 0, 0, 0 ) );
+	}
+
 	Hit hit;
-	if ( hitable->Hits( ray, 0.001, 10000, hit ) )
+	if ( hitable->Hits( ray, hit ) )
 	{
 		Ray scatter;
 		Vec3f atten;
 		if ( hit.mat->Scatter( ray, hit, atten, scatter ) )
 		{
-			return TraceResult( atten, TraceRay( scatter, hitable ) );
+			// cast a scattering ray, accumulating attenuation
+			return TraceRay( atten * attenuation, scatter, hitable );
 		}
 		else
 		{
+			// scatter failed, give up on ray
 			return TraceResult();
 		}
 	}
 	else
 	{
-		return TraceResult( EnvColor( ray.dir ) );
+		// hit the environment
+		return TraceResult( attenuation * EnvColor( ray.dir ) );
 	}
 }
 
@@ -67,21 +77,22 @@ int main( int argc, char** argv )
 
 	Vec3f origin( 0, 0, 0 );
 
-	Lambertian lamb_rose( Vec3f( 0.8f, 0.3f, 0.3f ) );
+	Lambertian lamb_blue( Vec3f( 0.1f, 0.2f, 0.5f ) );
 	Lambertian lamb_greenish( Vec3f( 0.8f, 0.8f, 0.0f ) );
 	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ), 0.3 );
-	Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
+	// Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
+	Dielectric diel_yellow( 1.5f );
 
-	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_rose );
+	Sphere blue_sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_blue );
 	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
 	Sphere gold_sphere( Vec3f( 1, 0, -1 ), 0.5, &metal_gold );
-	Sphere silver_sphere( Vec3f( -1, 0, -1 ), 0.5, &metal_silver );
+	Sphere diel_yellow_sphere( Vec3f( -1, 0, -1 ), 0.5, &diel_yellow );
 
 	HitableCollection collection;
-	collection.hitables.push_back( &sphere );
+	collection.hitables.push_back( &blue_sphere );
 	collection.hitables.push_back( &ground_sphere );
 	collection.hitables.push_back( &gold_sphere );
-	collection.hitables.push_back( &silver_sphere );
+	collection.hitables.push_back( &diel_yellow_sphere );
 
 	Camera cam( 90 /* fovy degrees */, 2 /* aspect ratio */ );
 
@@ -104,7 +115,7 @@ int main( int argc, char** argv )
 			for ( int k = 0; k < samples; k++ )
 			{
 				Ray ray = cam.GetRay( uv + off[ k ] );
-				TraceResult res = TraceRay( ray, &collection );
+				TraceResult res = TraceRay( Vec3f( 1, 1, 1 ), ray, &collection );
 				if ( res.Valid )
 				{
 					s++;

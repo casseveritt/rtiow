@@ -8,14 +8,14 @@ struct Sphere : public Hitable
 	typedef r3::Vec3f V;
 	Sphere( const V& center, const float radius, Material* material ) : c( center ), r( radius ), mat( material ) {}
 
-	bool Hits( const Ray& ray, float t_min, float t_max, Hit& hit )
+	bool Hits( const Ray& ray, Hit& hit )
 	{
 		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
 		float discr = quadr.Discriminant();
 		if ( discr >= 0 )
 		{
 			float t = quadr.ClosestForwardSolution( discr );
-			if ( t < 0 || t < t_min || t > t_max )
+			if ( t < 0 )
 			{
 				return false;
 			}
