@@ -4,6 +4,7 @@
 #include "hitable.h"
 #include "sphere.h"
 
+#include <random>
 #include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -40,21 +41,37 @@ int main( int argc, char** argv )
 	collection.hitables.push_back( &sphere2 );
 
 	Camera cam( 90, float( w ) / float( h ) );
+
+	std::mt19937 gen( 0 );
+	std::uniform_real_distribution<> dis( 0.0, 1.0 );
+
+	const int samples = 16;
+	Vec2f off[ samples ];
+	for ( int k = 0; k < samples; k++ )
+	{
+		off[ k ] = Vec2f( dis( gen ) / w, dis( gen ) / h );
+	}
+
 	for ( int j = 0; j < h; j++ )
 	{
 		for ( int i = 0; i < w; i++ )
 		{
-			Ray ray = cam.GetRay( ( i + 0.5f ) / w, ( ( h - 1 ) - j + 0.5f ) / h );
-			Vec3f col;
-			Hit hit;
-			if ( collection.Hits( ray, 0, 1000, &hit ) )
+			const Vec2f uv( float( i ) / w, float( h - 1 - j ) / h );
+			Vec3f col( 0, 0, 0 );
+			for ( int k = 0; k < samples; k++ )
 			{
-				col = hit.n * 0.5f + 0.5f;
+				Ray ray = cam.GetRay( uv + off[ k ] );
+				Hit hit;
+				if ( collection.Hits( ray, 0, 1000, &hit ) )
+				{
+					col += hit.n * 0.5f + 0.5f;
+				}
+				else
+				{
+					col += EnvColorFromRay( ray );
+				}
 			}
-			else
-			{
-				col = EnvColorFromRay( ray );
-			}
+			col /= samples;
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
 			img[ idx + 1 ] = int( 255 * col.y + 0.5f );
