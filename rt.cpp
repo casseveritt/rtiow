@@ -1,7 +1,7 @@
 
 
 #include "camera.h"
-#include "hitable.h"
+#include "lambertian.h"
 #include "sphere.h"
 
 #include <limits>
@@ -24,33 +24,17 @@ Vec3f EnvColor( const Vec3f& dir )
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
 
-struct RandomPointInUnitSphere
-{
-	RandomPointInUnitSphere() : gen( 0 ), dis( -1.0, 1.0 ) {}
-
-	Vec3f GetPoint()
-	{
-		Vec3f p( dis( gen ), dis( gen ), dis( gen ) );
-		while ( p.LengthSquared() > 1.0f )
-		{
-			p = Vec3f( dis( gen ), dis( gen ), dis( gen ) );
-		}
-		return p;
-	}
-
-	std::mt19937 gen;
-	std::uniform_real_distribution<> dis;
-};
-
-RandomPointInUnitSphere rpius;
-
 Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
 {
 	Hit hit;
-	if ( hitable->Hits( ray, 0, 1000, &hit ) )
+	if ( hitable->Hits( ray, 0.001, 10000, hit ) )
 	{
-		Ray new_ray( hit.p, hit.n + rpius.GetPoint() );
-		return 0.5f * ColorFromRay( new_ray, hitable );
+		Ray scatter;
+		Vec3f atten;
+		if ( hit.mat->Scatter( ray, hit, atten, scatter ) )
+		{
+			return atten * ColorFromRay( scatter, hitable );
+		}
 	}
 	else
 	{
@@ -60,7 +44,7 @@ Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
 
 Vec3f GammaFromLinear( const Vec3f& col )
 {
-	return Vec3f( sqrt( col.x ), sqrt( col.y ), sqrt( col.z ) );
+	return Vec3f( pow( col.x, 1 / 2.2 ), pow( col.y, 1 / 2.2 ), pow( col.z, 1 / 2.2 ) );
 }
 
 } // namespace
@@ -74,8 +58,10 @@ int main( int argc, char** argv )
 
 	Vec3f origin( 0, 0, 0 );
 
-	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5 );
-	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100 );
+	Lambertian lamb_grey( Vec3f( 0.5f, 0.5f, 0.5f ) );
+
+	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_grey );
+	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100, &lamb_grey );
 	HitableCollection collection;
 	collection.hitables.push_back( &sphere );
 	collection.hitables.push_back( &sphere2 );
@@ -102,7 +88,7 @@ int main( int argc, char** argv )
 			{
 				Ray ray = cam.GetRay( uv + off[ k ] );
 				Hit hit;
-				if ( collection.Hits( ray, 0, 1000, &hit ) )
+				if ( collection.Hits( ray, 0, 1000, hit ) )
 				{
 					col += hit.n * 0.5f + 0.5f;
 				}
