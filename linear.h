@@ -88,9 +88,9 @@ template <typename T> inline T ToRadians( T degrees )
 	return degrees * T( R3_DEG_TO_RAD );
 }
 
-template <typename T, typename S> inline T Lerp( const T & a, const T & b, S factor )
+template <typename T, typename S> inline T Lerp( const T& a, const T& b, S factor )
 {
-	return ( T(1) - factor ) * a + factor * b;
+	return ( T( 1 ) - factor ) * a + factor * b;
 }
 
 template <typename T> class Line;
