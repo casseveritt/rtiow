@@ -25,7 +25,16 @@ Vec3f EnvColor( const Vec3f& dir )
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
 }
 
-Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
+struct TraceResult
+{
+	TraceResult() : Valid( false ) {}
+	TraceResult( const Vec3f& col ) : Valid( true ), Color( col ) {}
+	TraceResult( const Vec3f& atten, const TraceResult& tr ) : Valid( tr.Valid ), Color( atten * tr.Color ) {}
+	bool Valid;
+	Vec3f Color;
+};
+
+TraceResult TraceRay( const Ray& ray, Hitable* hitable )
 {
 	Hit hit;
 	if ( hitable->Hits( ray, 0.001, 10000, hit ) )
@@ -34,12 +43,16 @@ Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
 		Vec3f atten;
 		if ( hit.mat->Scatter( ray, hit, atten, scatter ) )
 		{
-			return atten * ColorFromRay( scatter, hitable );
+			return TraceResult( atten, TraceRay( scatter, hitable ) );
+		}
+		else
+		{
+			return TraceResult();
 		}
 	}
 	else
 	{
-		return EnvColor( ray.dir );
+		return TraceResult( EnvColor( ray.dir ) );
 	}
 }
 
@@ -55,14 +68,15 @@ int main( int argc, char** argv )
 
 	const int w = 400;
 	const int h = 200;
+	const int samples = 100;
 	char* img = new char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
 
 	Lambertian lamb_rose( Vec3f( 0.8f, 0.3f, 0.3f ) );
 	Lambertian lamb_greenish( Vec3f( 0.8f, 0.8f, 0.0f ) );
-	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ) );
-	Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ) );
+	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ), 0.3 );
+	Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
 
 	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_rose );
 	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
@@ -80,7 +94,6 @@ int main( int argc, char** argv )
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
 
-	const int samples = 100;
 	Vec2f off[ samples ];
 	for ( int k = 0; k < samples; k++ )
 	{
@@ -93,20 +106,18 @@ int main( int argc, char** argv )
 		{
 			const Vec2f uv( float( i ) / w, float( h - 1 - j ) / h );
 			Vec3f col( 0, 0, 0 );
+			int s = 0;
 			for ( int k = 0; k < samples; k++ )
 			{
 				Ray ray = cam.GetRay( uv + off[ k ] );
-				Hit hit;
-				if ( collection.Hits( ray, 0, 1000, hit ) )
+				TraceResult res = TraceRay( ray, &collection );
+				if ( res.Valid )
 				{
-					col += hit.n * 0.5f + 0.5f;
-				}
-				else
-				{
-					col += EnvColor( ray.dir );
+					s++;
+					col += res.Color;
 				}
 			}
-			col /= samples;
+			col /= s;
 			col = GammaFromLinear( col );
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
