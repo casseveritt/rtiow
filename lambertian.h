@@ -7,7 +7,7 @@ struct Lambertian : public Material
 {
 	typedef r3::Vec3f V;
 
-	Lambertian( const V& attenuation ) : albedo( attenuation ) {}
+	Lambertian( const V& albdo ) : albedo( albdo ) {}
 
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
