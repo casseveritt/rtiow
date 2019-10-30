@@ -5,7 +5,7 @@ CFLAGS := -O2 -isystem stb -std=c++11 $(WARNFLAGS)
 
 all: rt
 
-H := $(wildcard *.h)
+H := $(filter-out $(wildcard stb_*.h), $(wildcard *.h) )
 
 rt: rt.cpp $(H)
 	g++ ${CFLAGS} rt.cpp -o rt
