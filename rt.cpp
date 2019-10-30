@@ -4,8 +4,8 @@
 #include "hitable.h"
 #include "sphere.h"
 
-#include <stdio.h>
 #include <random>
+#include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -38,7 +38,7 @@ int main( int argc, char** argv )
 	Camera cam( 90, 2 );
 
 	std::mt19937 gen( 0 );
-	std::uniform_real_distribution<> dis(0.0, 1.0);
+	std::uniform_real_distribution<> dis( 0.0, 1.0 );
 
 	const int samples = 16;
 	Vec2f off[ samples ];

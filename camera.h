@@ -18,9 +18,9 @@ struct Camera
 		printf( "cam: ur = ( %.2f, %.2f )\n", ur.x, ur.y );
 	}
 
-	Ray GetRay( const V2 & uv )
+	Ray GetRay( const V2& uv )
 	{
-		V3 dir( r3::Lerp( ll.x, ur.x, uv.x ) , r3::Lerp( ll.y, ur.y, uv.y ), -1 );
+		V3 dir( r3::Lerp( ll.x, ur.x, uv.x ), r3::Lerp( ll.y, ur.y, uv.y ), -1 );
 		return Ray( V3( 0, 0, 0 ), dir );
 	}
 
