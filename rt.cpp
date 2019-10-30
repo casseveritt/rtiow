@@ -58,6 +58,11 @@ Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
 	}
 }
 
+Vec3f GammaFromLinear( const Vec3f& col )
+{
+	return Vec3f( sqrt( col.x ), sqrt( col.y ), sqrt( col.z ) );
+}
+
 } // namespace
 
 int main( int argc, char** argv )
@@ -107,6 +112,7 @@ int main( int argc, char** argv )
 				}
 			}
 			col /= samples;
+			col = GammaFromLinear( col );
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
 			img[ idx + 1 ] = int( 255 * col.y + 0.5f );
