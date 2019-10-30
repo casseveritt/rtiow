@@ -88,6 +88,11 @@ template <typename T> inline T ToRadians( T degrees )
 	return degrees * T( R3_DEG_TO_RAD );
 }
 
+template <typename T, typename S> inline T Lerp( const T & a, const T & b, S factor )
+{
+	return ( T(1) - factor ) * a + factor * b;
+}
+
 template <typename T> class Line;
 template <typename T> class Plane;
 template <typename T> class Matrix3;
@@ -143,6 +148,14 @@ template <class T> struct Vec2
 			r += v[ i ] * v[ i ];
 		}
 		return r;
+	}
+
+	void Negate()
+	{
+		for ( int i = 0; i < N; i++ )
+		{
+			v[ i ] = -v[ i ];
+		}
 	}
 
 	T Normalize()

@@ -2,8 +2,9 @@
 
 all: rt
 
+H := $(wildcard *.h)
 
-rt: rt.cpp
+rt: rt.cpp $(H)
 	g++ -g -std=c++11 rt.cpp -o rt
 
 format:
@@ -19,6 +20,8 @@ format:
 	mv tmp.h quadratic.h
 	clang-format -style=file sphere.h > tmp.h
 	mv tmp.h sphere.h
+	clang-format -style=file camera.h > tmp.h
+	mv tmp.h camera.h
 
 clean:
 	rm -f *.o

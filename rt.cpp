@@ -2,6 +2,7 @@
 
 #include "hitable.h"
 #include "sphere.h"
+#include "camera.h"
 
 #include <stdio.h>
 
@@ -26,8 +27,6 @@ int main( int argc, char** argv )
 	char* img = new char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
-	Vec3f scale( 4.0f / w, 2.0f / h, 1.0f );
-	Vec3f bias( -2.0f, -1.0f, -1.0f );
 
 	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5 );
 	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100 );
@@ -35,12 +34,12 @@ int main( int argc, char** argv )
 	collection.hitables.push_back( & sphere );
 	collection.hitables.push_back( & sphere2 );
 
+	Camera cam( 90, 2 );
 	for ( int j = 0; j < h; j++ )
 	{
 		for ( int i = 0; i < w; i++ )
 		{
-			Vec3f coord( i + 0.5f, ( h - 1 ) - j + 0.5f, 0 );
-			Ray ray( origin, coord * scale + bias );
+			Ray ray = cam.GetRay( ( i + 0.5f ) / w, ( ( h - 1 ) - j + 0.5f ) / h );
 			Vec3f col;
 			Hit hit;
 			if ( collection.Hits( ray, 0, 1000, &hit ) )
