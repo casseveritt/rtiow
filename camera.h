@@ -2,7 +2,6 @@
 
 #include "ray.h"
 #include <cmath>
-#include <stdio.h>
 
 struct Camera
 {
@@ -15,7 +14,6 @@ struct Camera
 		ur.y = tan( 0.5f * fovy_deg * M_PI / 180.0 );
 		ur.x = aspect * ur.y;
 		ll = -ur;
-		printf( "cam: ur = ( %.2f, %.2f )\n", ur.x, ur.y );
 	}
 
 	Ray GetRay( const V2& uv )
