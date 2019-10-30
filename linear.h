@@ -169,7 +169,7 @@ template <class T> struct Vec2
 		return len;
 	}
 
-	Vec2 Normalized()
+	Vec2 Normalized() const
 	{
 		Vec2 v( *this );
 		v.Normalize();
@@ -428,7 +428,7 @@ template <typename T> class Vec3
 		return len;
 	}
 
-	Vec3 Normalized()
+	Vec3 Normalized() const
 	{
 		Vec3 n( *this );
 		n.Normalize();
@@ -715,7 +715,7 @@ template <typename T> class Vec4
 		return len;
 	}
 
-	Vec4 Normalized()
+	Vec4 Normalized() const
 	{
 		Vec4 n( *this );
 		n.Normalize();
@@ -2062,7 +2062,7 @@ template <typename T> class Quaternion
 		w *= rnorm;
 	}
 
-	Quaternion Normalized()
+	Quaternion Normalized() const
 	{
 		Quaternion q( *this );
 		q.Normalize();

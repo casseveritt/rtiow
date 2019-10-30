@@ -5,7 +5,7 @@ all: rt
 H := $(wildcard *.h)
 
 rt: rt.cpp $(H)
-	g++ -g -std=c++11 rt.cpp -o rt
+	g++ -O2 -std=c++11 rt.cpp -o rt
 
 format:
 	clang-format -style=file rt.cpp > tmp.cpp
@@ -22,6 +22,8 @@ format:
 	mv tmp.h sphere.h
 	clang-format -style=file camera.h > tmp.h
 	mv tmp.h camera.h
+	clang-format -style=file env.h > tmp.h
+	mv tmp.h env.h
 
 clean:
 	rm -f *.o

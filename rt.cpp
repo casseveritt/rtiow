@@ -1,10 +1,11 @@
 
 
 #include "camera.h"
-#include "hitable.h"
 #include "sphere.h"
+#include "env.h"
 
 #include <random>
+#include <limits>
 #include <stdio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -12,12 +13,11 @@
 
 using namespace r3;
 
-Vec3f EnvColorFromRay( const Ray& ray )
+Vec3f EnvColor( const Vec3f& dir )
 {
-	Vec3f unit = ray.dir / ray.dir.Length();
+	Vec3f unit = dir.Normalized();
 	float t = 0.5f * ( unit.y + 1.0f );
-	// printf( "t = %.2f\n", t );
-	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
+	return r3::Lerp( Vec3f( 1, 1, 1 ), Vec3f( 0.5f, 0.7f, 1.0f ), t );
 }
 
 int main( int argc, char** argv )
@@ -31,16 +31,18 @@ int main( int argc, char** argv )
 
 	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5 );
 	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100 );
+	Env env;
 	HitableCollection collection;
 	collection.hitables.push_back( &sphere );
 	collection.hitables.push_back( &sphere2 );
+	collection.hitables.push_back( &env );
 
-	Camera cam( 90, 2 );
+	Camera cam( 90 /* fovy degrees */, 2 /* aspect ratio */ );
 
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
 
-	const int samples = 16;
+	const int samples = 64;
 	Vec2f off[ samples ];
 	for ( int k = 0; k < samples; k++ )
 	{
@@ -57,13 +59,15 @@ int main( int argc, char** argv )
 			{
 				Ray ray = cam.GetRay( uv + off[ k ] );
 				Hit hit;
-				if ( collection.Hits( ray, 0, 1000, &hit ) )
+				// We don't check hits, because env will always hit
+				collection.Hits( ray, 0, 1000, &hit );
+				if ( hit.t < std::numeric_limits<float>::max() )
 				{
 					col += hit.n * 0.5f + 0.5f;
 				}
 				else
 				{
-					col += EnvColorFromRay( ray );
+					col += EnvColor( ray.dir );
 				}
 			}
 			col /= samples;
