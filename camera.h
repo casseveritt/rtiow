@@ -2,7 +2,6 @@
 
 #include "ray.h"
 #include <cmath>
-#include <stdio.h>
 
 struct Camera
 {

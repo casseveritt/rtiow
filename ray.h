@@ -6,7 +6,7 @@ struct Ray
 {
 	typedef r3::Vec3f V;
 	Ray() {}
-	Ray( const V& origin, const V& direction ) : o( origin ), dir( direction ) {}
+	Ray( const V& origin, const V& direction, float fwd = 0.001f ) : o( origin + direction * fwd ), dir( direction ) {}
 
 	V At( float t ) const
 	{
