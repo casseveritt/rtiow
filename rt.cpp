@@ -4,6 +4,7 @@
 #include "hitable.h"
 #include "sphere.h"
 
+#include <limits>
 #include <random>
 #include <stdio.h>
 
@@ -15,12 +16,46 @@ using namespace r3;
 namespace
 {
 
-Vec3f EnvColorFromRay( const Ray& ray )
+Vec3f EnvColor( const Vec3f& dir )
 {
-	Vec3f unit = ray.dir / ray.dir.Length();
+	Vec3f unit = dir / dir.Length();
 	float t = 0.5f * ( unit.y + 1.0f );
 	// printf( "t = %.2f\n", t );
 	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
+}
+
+struct RandomPointInUnitSphere
+{
+	RandomPointInUnitSphere() : gen( 0 ), dis( -1.0, 1.0 ) {}
+
+	Vec3f GetPoint()
+	{
+		Vec3f p( dis( gen ), dis( gen ), dis( gen ) );
+		while ( p.LengthSquared() > 1.0f )
+		{
+			p = Vec3f( dis( gen ), dis( gen ), dis( gen ) );
+		}
+		return p;
+	}
+
+	std::mt19937 gen;
+	std::uniform_real_distribution<> dis;
+};
+
+RandomPointInUnitSphere rpius;
+
+Vec3f ColorFromRay( const Ray& ray, Hitable* hitable )
+{
+	Hit hit;
+	if ( hitable->Hits( ray, 0, 1000, &hit ) )
+	{
+		Ray new_ray( hit.p, hit.n + rpius.GetPoint() );
+		return 0.5f * ColorFromRay( new_ray, hitable );
+	}
+	else
+	{
+		return EnvColor( ray.dir );
+	}
 }
 
 } // namespace
@@ -68,7 +103,7 @@ int main( int argc, char** argv )
 				}
 				else
 				{
-					col += EnvColorFromRay( ray );
+					col += EnvColor( ray.dir );
 				}
 			}
 			col /= samples;
