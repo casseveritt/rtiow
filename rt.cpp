@@ -41,11 +41,15 @@ int main( int argc, char** argv )
 		{
 			Vec3f coord( i + 0.5f, ( h - 1 ) - j + 0.5f, 0 );
 			Ray ray( origin, coord * scale + bias );
-			Vec3f col = EnvColorFromRay( ray );
+			Vec3f col;
 			Hit hit;
 			if ( collection.Hits( ray, 0, 1000, &hit ) )
 			{
 				col = hit.n * 0.5f + 0.5f;
+			}
+			else
+			{
+				col = EnvColorFromRay( ray );
 			}
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
