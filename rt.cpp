@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "lambertian.h"
+#include "metal.h"
 #include "sphere.h"
 
 #include <limits>
@@ -58,20 +59,28 @@ int main( int argc, char** argv )
 
 	Vec3f origin( 0, 0, 0 );
 
-	Lambertian lamb_grey( Vec3f( 0.5f, 0.5f, 0.5f ) );
+	Lambertian lamb_rose( Vec3f( 0.8f, 0.3f, 0.3f ) );
+	Lambertian lamb_greenish( Vec3f( 0.8f, 0.8f, 0.0f ) );
+	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ) );
+	Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ) );
 
-	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_grey );
-	Sphere sphere2( Vec3f( 0, -100.5, -1 ), 100, &lamb_grey );
+	Sphere sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_rose );
+	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
+	Sphere gold_sphere( Vec3f( 1, 0, -1 ), 0.5, &metal_gold );
+	Sphere silver_sphere( Vec3f( -1, 0, -1 ), 0.5, &metal_silver );
+
 	HitableCollection collection;
 	collection.hitables.push_back( &sphere );
-	collection.hitables.push_back( &sphere2 );
+	collection.hitables.push_back( &ground_sphere );
+	collection.hitables.push_back( &gold_sphere );
+	collection.hitables.push_back( &silver_sphere );
 
 	Camera cam( 90, 2 );
 
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
 
-	const int samples = 16;
+	const int samples = 100;
 	Vec2f off[ samples ];
 	for ( int k = 0; k < samples; k++ )
 	{
