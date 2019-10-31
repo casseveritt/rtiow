@@ -7,11 +7,18 @@ struct Dielectric : public Material
 {
 	typedef r3::Vec3f V;
 
-	Dielectric( float index_of_refraction ) : refr_index( index_of_refraction ) {}
+	Dielectric( float index_of_refraction ) : refr_index( index_of_refraction ), gen( 0 ), dis( 0.0, 1.0 ) {}
 
 	static inline V Reflect( const V& incident, const V& normal )
 	{
 		return incident - 2 * incident.Dot( normal ) * normal;
+	}
+
+	static inline float Schlick( float cosine, float nr )
+	{
+		float r0 = ( 1 - nr ) / ( 1 + nr );
+		r0 = r0 * r0;
+		return r0 + ( 1 - r0 ) * pow( ( 1 - cosine ), 5.0f );
 	}
 
 	static inline bool Refract( const V& incident, const V& normal, float nr, V& refracted )
@@ -23,29 +30,24 @@ struct Dielectric : public Material
 			refracted = nr * ( incident - dt * normal ) - normal * sqrt( discriminant );
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
 		bool outside = incident.dir.Dot( hit.n ) < 0;
 		V normal = outside ? hit.n : -hit.n;
-		float index_ratio = outside ? 1.0f / refr_index : refr_index;
+		float nr = outside ? 1.0f / refr_index : refr_index;
 		V refr;
-		if ( Refract( incident.dir, normal, index_ratio, refr ) )
+		if ( Refract( incident.dir, normal, nr, refr ) && RandomScalar() > Schlick( -incident.dir.Dot( normal ), nr ) )
 		{
 			scattered = Ray( hit.p, refr );
-			attenuation = V( 1, 1, 1 );
 		}
 		else
 		{
-			V refl = Reflect( incident.dir, normal );
-			scattered = Ray( hit.p, refl );
-			attenuation = V( 1, 0, 0 );
+			scattered = Ray( hit.p, Reflect( incident.dir, normal ) );
 		}
+		attenuation = V( 1, 1, 1 );
 		return true;
 	}
 
@@ -67,7 +69,14 @@ struct Dielectric : public Material
 		std::uniform_real_distribution<> dis;
 	};
 
+	float RandomScalar() const
+	{
+		return dis( gen );
+	}
+
 	mutable RandomPointInUnitSphere rpius;
 
 	float refr_index;
+	mutable std::mt19937 gen;
+	mutable std::uniform_real_distribution<> dis;
 };
