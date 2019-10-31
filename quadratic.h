@@ -24,20 +24,20 @@ template <typename T> struct Quadratic
 		return b * b - 4 * a * c;
 	}
 
-	T ClosestForwardSolution( T discr )
+	T ClosestForwardSolution( T discr, float min_soln = 0 )
 	{
 		if ( discr < 0 )
 		{
 			return -1;
 		}
 		T rt_discr = std::sqrt( discr );
-		if ( -b > rt_discr )
+		if ( ( -b - rt_discr ) > min_soln )
 		{
-			return ( -b - std::sqrt( discr ) ) / ( T( 2 ) * a );
+			return ( -b - rt_discr ) / ( T( 2 ) * a );
 		}
-		else if ( b < rt_discr )
+		else if ( ( -b + rt_discr ) > min_soln )
 		{
-			return ( -b + std::sqrt( discr ) ) / ( T( 2 ) * a );
+			return ( -b + rt_discr ) / ( T( 2 ) * a );
 		}
 		return -1;
 	}
