@@ -16,14 +16,10 @@ struct Metal : public Material
 
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
-		V refl = Reflect( incident.dir.Normalized(), hit.n ) + rpius.GetPoint() * fuzz;
-		if ( refl.Dot( hit.n ) > 0 )
-		{
-			scattered = Ray( hit.p, refl );
-			attenuation = albedo;
-			return true;
-		}
-		return false;
+		V refl = Reflect( incident.dir, hit.n ) + rpius.GetPoint() * fuzz;
+		scattered = Ray( hit.p, refl );
+		attenuation = albedo;
+		return true;
 	}
 
 	struct RandomPointInUnitSphere
