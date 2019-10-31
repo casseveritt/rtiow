@@ -20,10 +20,8 @@ namespace
 
 Vec3f EnvColor( const Vec3f& dir )
 {
-	Vec3f unit = dir / dir.Length();
-	float t = 0.5f * ( unit.y + 1.0f );
-	// printf( "t = %.2f\n", t );
-	return ( 1.0f - t ) * Vec3f( 1, 1, 1 ) + t * Vec3f( 0.5f, 0.7f, 1.0f );
+	float t = 0.5f * dir.y + 0.5f;
+	return r3::Lerp( Vec3f( 1, 1, 1 ), Vec3f( 0.5f, 0.7f, 1.0f ), t );
 }
 
 struct TraceResult

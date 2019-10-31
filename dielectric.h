@@ -14,9 +14,8 @@ struct Dielectric : public Material
 		return incident - 2 * incident.Dot( normal ) * normal;
 	}
 
-	static inline bool Refract( const V& incid, const V& normal, float nr, V& refracted )
+	static inline bool Refract( const V& incident, const V& normal, float nr, V& refracted )
 	{
-		V incident = incid.Normalized();
 		float dt = incident.Dot( normal );
 		float discriminant = 1.0f - nr * nr * ( 1 - dt * dt );
 		if ( discriminant > 0.0f )
@@ -43,16 +42,9 @@ struct Dielectric : public Material
 		}
 		else
 		{
-			V refl = Reflect( incident.dir.Normalized(), normal );
-			if ( refl.Dot( normal ) > 0 )
-			{
-				scattered = Ray( hit.p, refl );
-				attenuation = V( 1, 0, 0 );
-			}
-			else
-			{
-				return false;
-			}
+			V refl = Reflect( incident.dir, normal );
+			scattered = Ray( hit.p, refl );
+			attenuation = V( 1, 0, 0 );
 		}
 		return true;
 	}
