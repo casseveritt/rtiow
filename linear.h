@@ -171,9 +171,9 @@ template <class T> struct Vec2
 
 	Vec2 Normalized() const
 	{
-		Vec2 v( *this );
-		v.Normalize();
-		return v;
+		Vec2 n( *this );
+		n.Normalize();
+		return n;
 	}
 
 	T& operator[]( int i )
@@ -326,18 +326,18 @@ template <typename T> class Vec3
 		z = tp[ 2 ];
 	}
 
-	Vec3( T x, T y, T z )
+	Vec3( T x_, T y_, T z_ )
 	{
-		v[ 0 ] = x;
-		v[ 1 ] = y;
-		v[ 2 ] = z;
+		v[ 0 ] = x_;
+		v[ 1 ] = y_;
+		v[ 2 ] = z_;
 	}
 
-	void GetValue( T& x, T& y, T& z ) const
+	void GetValue( T& x_, T& y_, T& z_ ) const
 	{
-		x = v[ 0 ];
-		y = v[ 1 ];
-		z = v[ 2 ];
+		x_ = v[ 0 ];
+		y_ = v[ 1 ];
+		z_ = v[ 2 ];
 	}
 
 	Vec3 Cross( const Vec3& rhs ) const
@@ -349,11 +349,11 @@ template <typename T> class Vec3
 		return rt;
 	}
 
-	Vec3& SetValue( const T& x, const T& y, const T& z )
+	Vec3& SetValue( const T& x_, const T& y_, const T& z_ )
 	{
-		v[ 0 ] = x;
-		v[ 1 ] = y;
-		v[ 2 ] = z;
+		v[ 0 ] = x_;
+		v[ 1 ] = y_;
+		v[ 2 ] = z_;
 		return *this;
 	}
 
@@ -619,28 +619,28 @@ template <typename T> class Vec4
 		v[ 2 ] = t.z;
 		v[ 3 ] = fourth;
 	}
-	Vec4( T x, T y, T z = 0, T w = 1 )
+	Vec4( T x_, T y_, T z_ = 0, T w_ = 1 )
 	{
-		v[ 0 ] = x;
-		v[ 1 ] = y;
-		v[ 2 ] = z;
-		v[ 3 ] = w;
+		v[ 0 ] = x_;
+		v[ 1 ] = y_;
+		v[ 2 ] = z_;
+		v[ 3 ] = w_;
 	}
 
-	void GetValue( T& x, T& y, T& z, T& w ) const
+	void GetValue( T& x_, T& y_, T& z_, T& w_ ) const
 	{
-		x = v[ 0 ];
-		y = v[ 1 ];
-		z = v[ 2 ];
-		w = v[ 3 ];
+		x_ = v[ 0 ];
+		y_ = v[ 1 ];
+		z_ = v[ 2 ];
+		w_ = v[ 3 ];
 	}
 
-	Vec4& SetValue( const T& x, const T& y, const T& z, const T& w )
+	Vec4& SetValue( const T& x_, const T& y_, const T& z_, const T& w_ )
 	{
-		v[ 0 ] = x;
-		v[ 1 ] = y;
-		v[ 2 ] = z;
-		v[ 3 ] = w;
+		v[ 0 ] = x_;
+		v[ 1 ] = y_;
+		v[ 2 ] = z_;
+		v[ 3 ] = w_;
 		return *this;
 	}
 
@@ -1177,32 +1177,32 @@ template <typename T> class Matrix4
 		MakeIdentity();
 	}
 
-	Matrix4( T* m )
+	Matrix4( T* m_ )
 	{
-		SetValue( m );
+		SetValue( m_ );
 	}
 
 	Matrix4( T a00, T a01, T a02, T a03, T a10, T a11, T a12, T a13, T a20, T a21, T a22, T a23, T a30, T a31, T a32, T a33 )
 	{
-		element( 0, 0 ) = a00;
-		element( 0, 1 ) = a01;
-		element( 0, 2 ) = a02;
-		element( 0, 3 ) = a03;
+		el( 0, 0 ) = a00;
+		el( 0, 1 ) = a01;
+		el( 0, 2 ) = a02;
+		el( 0, 3 ) = a03;
 
-		element( 1, 0 ) = a10;
-		element( 1, 1 ) = a11;
-		element( 1, 2 ) = a12;
-		element( 1, 3 ) = a13;
+		el( 1, 0 ) = a10;
+		el( 1, 1 ) = a11;
+		el( 1, 2 ) = a12;
+		el( 1, 3 ) = a13;
 
-		element( 2, 0 ) = a20;
-		element( 2, 1 ) = a21;
-		element( 2, 2 ) = a22;
-		element( 2, 3 ) = a23;
+		el( 2, 0 ) = a20;
+		el( 2, 1 ) = a21;
+		el( 2, 2 ) = a22;
+		el( 2, 3 ) = a23;
 
-		element( 3, 0 ) = a30;
-		element( 3, 1 ) = a31;
-		element( 3, 2 ) = a32;
-		element( 3, 3 ) = a33;
+		el( 3, 0 ) = a30;
+		el( 3, 1 ) = a31;
+		el( 3, 2 ) = a32;
+		el( 3, 3 ) = a33;
 	}
 
 	void GetValue( T* mp ) const
@@ -1212,7 +1212,7 @@ template <typename T> class Matrix4
 		{
 			for ( int i = 0; i < 4; i++ )
 			{
-				mp[ c++ ] = element( i, j );
+				mp[ c++ ] = el( i, j );
 			}
 		}
 	}
@@ -1229,7 +1229,7 @@ template <typename T> class Matrix4
 		{
 			for ( int i = 0; i < 4; i++ )
 			{
-				element( i, j ) = mp[ c++ ];
+				el( i, j ) = mp[ c++ ];
 			}
 		}
 	}
@@ -1240,32 +1240,32 @@ template <typename T> class Matrix4
 		{
 			for ( int j = 0; j < 4; j++ )
 			{
-				element( i, j ) = r;
+				el( i, j ) = r;
 			}
 		}
 	}
 
 	void MakeIdentity()
 	{
-		element( 0, 0 ) = 1.0;
-		element( 0, 1 ) = 0.0;
-		element( 0, 2 ) = 0.0;
-		element( 0, 3 ) = 0.0;
+		el( 0, 0 ) = 1.0;
+		el( 0, 1 ) = 0.0;
+		el( 0, 2 ) = 0.0;
+		el( 0, 3 ) = 0.0;
 
-		element( 1, 0 ) = 0.0;
-		element( 1, 1 ) = 1.0;
-		element( 1, 2 ) = 0.0;
-		element( 1, 3 ) = 0.0;
+		el( 1, 0 ) = 0.0;
+		el( 1, 1 ) = 1.0;
+		el( 1, 2 ) = 0.0;
+		el( 1, 3 ) = 0.0;
 
-		element( 2, 0 ) = 0.0;
-		element( 2, 1 ) = 0.0;
-		element( 2, 2 ) = 1.0;
-		element( 2, 3 ) = 0.0;
+		el( 2, 0 ) = 0.0;
+		el( 2, 1 ) = 0.0;
+		el( 2, 2 ) = 1.0;
+		el( 2, 3 ) = 0.0;
 
-		element( 3, 0 ) = 0.0;
-		element( 3, 1 ) = 0.0;
-		element( 3, 2 ) = 0.0;
-		element( 3, 3 ) = 1.0;
+		el( 3, 0 ) = 0.0;
+		el( 3, 1 ) = 0.0;
+		el( 3, 2 ) = 0.0;
+		el( 3, 3 ) = 1.0;
 	}
 
 	static Matrix4 Identity()
@@ -1276,68 +1276,68 @@ template <typename T> class Matrix4
 
 	static Matrix4 Scale( T s )
 	{
-		Matrix4 m;
-		m.SetScale( s );
-		return m;
+		Matrix4 mat;
+		mat.SetScale( s );
+		return mat;
 	}
 
 	static Matrix4 Scale( Vec3<T> s )
 	{
-		Matrix4 m;
-		m.SetScale( s );
-		return m;
+		Matrix4 mat;
+		mat.SetScale( s );
+		return mat;
 	}
 
 	static Matrix4 Translate( Vec3<T> t )
 	{
-		Matrix4 m;
-		m.SetTranslate( t );
-		return m;
+		Matrix4 mat;
+		mat.SetTranslate( t );
+		return mat;
 	}
 
 	void SetScale( T s )
 	{
-		element( 0, 0 ) = s;
-		element( 1, 1 ) = s;
-		element( 2, 2 ) = s;
+		el( 0, 0 ) = s;
+		el( 1, 1 ) = s;
+		el( 2, 2 ) = s;
 	}
 
 	void SetScale( const Vec3<T>& s )
 	{
-		element( 0, 0 ) = s.x;
-		element( 1, 1 ) = s.y;
-		element( 2, 2 ) = s.z;
+		el( 0, 0 ) = s.x;
+		el( 1, 1 ) = s.y;
+		el( 2, 2 ) = s.z;
 	}
 
 	void SetTranslate( const Vec3<T>& t )
 	{
-		element( 0, 3 ) = t.x;
-		element( 1, 3 ) = t.y;
-		element( 2, 3 ) = t.z;
+		el( 0, 3 ) = t.x;
+		el( 1, 3 ) = t.y;
+		el( 2, 3 ) = t.z;
 	}
 
 	void SetRow( int r, const Vec4<T>& t )
 	{
-		element( r, 0 ) = t.x;
-		element( r, 1 ) = t.y;
-		element( r, 2 ) = t.z;
-		element( r, 3 ) = t.w;
+		el( r, 0 ) = t.x;
+		el( r, 1 ) = t.y;
+		el( r, 2 ) = t.z;
+		el( r, 3 ) = t.w;
 	}
 
 	void SetColumn( int c, const Vec4<T>& t )
 	{
-		element( 0, c ) = t.x;
-		element( 1, c ) = t.y;
-		element( 2, c ) = t.z;
-		element( 3, c ) = t.w;
+		el( 0, c ) = t.x;
+		el( 1, c ) = t.y;
+		el( 2, c ) = t.z;
+		el( 3, c ) = t.w;
 	}
 
 	void GetRow( int r, Vec4<T>& t ) const
 	{
-		t.x = element( r, 0 );
-		t.y = element( r, 1 );
-		t.z = element( r, 2 );
-		t.w = element( r, 3 );
+		t.x = el( r, 0 );
+		t.y = el( r, 1 );
+		t.z = el( r, 2 );
+		t.w = el( r, 3 );
 	}
 
 	Vec4<T> GetRow( int r ) const
@@ -1349,10 +1349,10 @@ template <typename T> class Matrix4
 
 	void GetColumn( int c, Vec4<T>& t ) const
 	{
-		t.x = element( 0, c );
-		t.y = element( 1, c );
-		t.z = element( 2, c );
-		t.w = element( 3, c );
+		t.x = el( 0, c );
+		t.y = el( 1, c );
+		t.z = el( 2, c );
+		t.w = el( 3, c );
 	}
 
 	Vec4<T> GetColumn( int c ) const
@@ -1379,7 +1379,7 @@ template <typename T> class Matrix4
 		{
 			for ( j = 0; j < 4; j++ )
 			{
-				s[ i ][ j ] = element( i, j );
+				s[ i ][ j ] = el( i, j );
 				if ( i == j )
 					s[ i ][ j + 4 ] = 1.0;
 				else
@@ -1494,7 +1494,7 @@ template <typename T> class Matrix4
 		{
 			for ( int j = 0; j < 4; j++ )
 			{
-				mtrans( i, j ) = element( j, i );
+				mtrans( i, j ) = el( j, i );
 			}
 		}
 		return mtrans;
@@ -1511,7 +1511,7 @@ template <typename T> class Matrix4
 			{
 				for ( int c = 0; c < 4; c++ )
 				{
-					element( i, j ) += mt( i, c ) * b( c, j );
+					el( i, j ) += mt( i, c ) * b( c, j );
 				}
 			}
 		}
@@ -1529,7 +1529,7 @@ template <typename T> class Matrix4
 			{
 				for ( int c = 0; c < 4; c++ )
 				{
-					element( i, j ) += b( i, c ) * mt( c, j );
+					el( i, j ) += b( i, c ) * mt( c, j );
 				}
 			}
 		}
@@ -1539,13 +1539,13 @@ template <typename T> class Matrix4
 	// dst = M * src
 	void MultMatrixVec( const Vec3<T>& src, Vec3<T>& dst ) const
 	{
-		T w = ( src.x * element( 3, 0 ) + src.y * element( 3, 1 ) + src.z * element( 3, 2 ) + element( 3, 3 ) );
+		T w = ( src.x * el( 3, 0 ) + src.y * el( 3, 1 ) + src.z * el( 3, 2 ) + el( 3, 3 ) );
 
 		assert( w != R3_ZERO );
 
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 0, 1 ) + src.z * element( 0, 2 ) + element( 0, 3 ) ) / w;
-		dst.y = ( src.x * element( 1, 0 ) + src.y * element( 1, 1 ) + src.z * element( 1, 2 ) + element( 1, 3 ) ) / w;
-		dst.z = ( src.x * element( 2, 0 ) + src.y * element( 2, 1 ) + src.z * element( 2, 2 ) + element( 2, 3 ) ) / w;
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 0, 1 ) + src.z * el( 0, 2 ) + el( 0, 3 ) ) / w;
+		dst.y = ( src.x * el( 1, 0 ) + src.y * el( 1, 1 ) + src.z * el( 1, 2 ) + el( 1, 3 ) ) / w;
+		dst.z = ( src.x * el( 2, 0 ) + src.y * el( 2, 1 ) + src.z * el( 2, 2 ) + el( 2, 3 ) ) / w;
 	}
 
 	void MultMatrixVec( Vec3<T>& src_and_dst ) const
@@ -1556,13 +1556,13 @@ template <typename T> class Matrix4
 	// dst = src * M
 	void MultVecMatrix( const Vec3<T>& src, Vec3<T>& dst ) const
 	{
-		T w = ( src.x * element( 0, 3 ) + src.y * element( 1, 3 ) + src.z * element( 2, 3 ) + element( 3, 3 ) );
+		T w = ( src.x * el( 0, 3 ) + src.y * el( 1, 3 ) + src.z * el( 2, 3 ) + el( 3, 3 ) );
 
 		assert( w != R3_ZERO );
 
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 1, 0 ) + src.z * element( 2, 0 ) + element( 3, 0 ) ) / w;
-		dst.y = ( src.x * element( 0, 1 ) + src.y * element( 1, 1 ) + src.z * element( 2, 1 ) + element( 3, 1 ) ) / w;
-		dst.z = ( src.x * element( 0, 2 ) + src.y * element( 1, 2 ) + src.z * element( 2, 2 ) + element( 3, 2 ) ) / w;
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 1, 0 ) + src.z * el( 2, 0 ) + el( 3, 0 ) ) / w;
+		dst.y = ( src.x * el( 0, 1 ) + src.y * el( 1, 1 ) + src.z * el( 2, 1 ) + el( 3, 1 ) ) / w;
+		dst.z = ( src.x * el( 0, 2 ) + src.y * el( 1, 2 ) + src.z * el( 2, 2 ) + el( 3, 2 ) ) / w;
 	}
 
 	void MultVecMatrix( Vec3<T>& src_and_dst ) const
@@ -1573,10 +1573,10 @@ template <typename T> class Matrix4
 	// dst = M * src
 	void MultMatrixVec( const Vec4<T>& src, Vec4<T>& dst ) const
 	{
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 0, 1 ) + src.z * element( 0, 2 ) + src.w * element( 0, 3 ) );
-		dst.y = ( src.x * element( 1, 0 ) + src.y * element( 1, 1 ) + src.z * element( 1, 2 ) + src.w * element( 1, 3 ) );
-		dst.z = ( src.x * element( 2, 0 ) + src.y * element( 2, 1 ) + src.z * element( 2, 2 ) + src.w * element( 2, 3 ) );
-		dst.w = ( src.x * element( 3, 0 ) + src.y * element( 3, 1 ) + src.z * element( 3, 2 ) + src.w * element( 3, 3 ) );
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 0, 1 ) + src.z * el( 0, 2 ) + src.w * el( 0, 3 ) );
+		dst.y = ( src.x * el( 1, 0 ) + src.y * el( 1, 1 ) + src.z * el( 1, 2 ) + src.w * el( 1, 3 ) );
+		dst.z = ( src.x * el( 2, 0 ) + src.y * el( 2, 1 ) + src.z * el( 2, 2 ) + src.w * el( 2, 3 ) );
+		dst.w = ( src.x * el( 3, 0 ) + src.y * el( 3, 1 ) + src.z * el( 3, 2 ) + src.w * el( 3, 3 ) );
 	}
 
 	void MultMatrixVec( Vec4<T>& src_and_dst ) const
@@ -1587,10 +1587,10 @@ template <typename T> class Matrix4
 	// dst = src * M
 	void MultVecMatrix( const Vec4<T>& src, Vec4<T>& dst ) const
 	{
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 1, 0 ) + src.z * element( 2, 0 ) + src.w * element( 3, 0 ) );
-		dst.y = ( src.x * element( 0, 1 ) + src.y * element( 1, 1 ) + src.z * element( 2, 1 ) + src.w * element( 3, 1 ) );
-		dst.z = ( src.x * element( 0, 2 ) + src.y * element( 1, 2 ) + src.z * element( 2, 2 ) + src.w * element( 3, 2 ) );
-		dst.w = ( src.x * element( 0, 3 ) + src.y * element( 1, 3 ) + src.z * element( 2, 3 ) + src.w * element( 3, 3 ) );
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 1, 0 ) + src.z * el( 2, 0 ) + src.w * el( 3, 0 ) );
+		dst.y = ( src.x * el( 0, 1 ) + src.y * el( 1, 1 ) + src.z * el( 2, 1 ) + src.w * el( 3, 1 ) );
+		dst.z = ( src.x * el( 0, 2 ) + src.y * el( 1, 2 ) + src.z * el( 2, 2 ) + src.w * el( 3, 2 ) );
+		dst.w = ( src.x * el( 0, 3 ) + src.y * el( 1, 3 ) + src.z * el( 2, 3 ) + src.w * el( 3, 3 ) );
 	}
 
 	void MultVecMatrix( Vec4<T>& src_and_dst ) const
@@ -1601,9 +1601,9 @@ template <typename T> class Matrix4
 	// dst = M * src
 	void MultMatrixDir( const Vec3<T>& src, Vec3<T>& dst ) const
 	{
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 0, 1 ) + src.z * element( 0, 2 ) );
-		dst.y = ( src.x * element( 1, 0 ) + src.y * element( 1, 1 ) + src.z * element( 1, 2 ) );
-		dst.z = ( src.x * element( 2, 0 ) + src.y * element( 2, 1 ) + src.z * element( 2, 2 ) );
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 0, 1 ) + src.z * el( 0, 2 ) );
+		dst.y = ( src.x * el( 1, 0 ) + src.y * el( 1, 1 ) + src.z * el( 1, 2 ) );
+		dst.z = ( src.x * el( 2, 0 ) + src.y * el( 2, 1 ) + src.z * el( 2, 2 ) );
 	}
 
 	void MultMatrixDir( Vec3<T>& src_and_dst ) const
@@ -1614,9 +1614,9 @@ template <typename T> class Matrix4
 	// dst = src * M
 	void MultDirMatrix( const Vec3<T>& src, Vec3<T>& dst ) const
 	{
-		dst.x = ( src.x * element( 0, 0 ) + src.y * element( 1, 0 ) + src.z * element( 2, 0 ) );
-		dst.y = ( src.x * element( 0, 1 ) + src.y * element( 1, 1 ) + src.z * element( 2, 1 ) );
-		dst.z = ( src.x * element( 0, 2 ) + src.y * element( 1, 2 ) + src.z * element( 2, 2 ) );
+		dst.x = ( src.x * el( 0, 0 ) + src.y * el( 1, 0 ) + src.z * el( 2, 0 ) );
+		dst.y = ( src.x * el( 0, 1 ) + src.y * el( 1, 1 ) + src.z * el( 2, 1 ) );
+		dst.z = ( src.x * el( 0, 2 ) + src.y * el( 1, 2 ) + src.z * el( 2, 2 ) );
 	}
 
 	void MultDirMatrix( Vec3<T>& src_and_dst ) const
@@ -1626,20 +1626,20 @@ template <typename T> class Matrix4
 
 	T& operator()( int row, int col )
 	{
-		return element( row, col );
+		return el( row, col );
 	}
 
 	const T& operator()( int row, int col ) const
 	{
-		return element( row, col );
+		return el( row, col );
 	}
 
-	T& element( int row, int col )
+	T& el( int row, int col )
 	{
 		return m[ row | ( col << 2 ) ];
 	}
 
-	const T& element( int row, int col ) const
+	const T& el( int row, int col ) const
 	{
 		return m[ row | ( col << 2 ) ];
 	}
@@ -1654,10 +1654,10 @@ template <typename T> class Matrix4
 	{
 		for ( int i = 0; i < 4; ++i )
 		{
-			element( 0, i ) *= r;
-			element( 1, i ) *= r;
-			element( 2, i ) *= r;
-			element( 3, i ) *= r;
+			el( 0, i ) *= r;
+			el( 1, i ) *= r;
+			el( 2, i ) *= r;
+			el( 3, i ) *= r;
 		}
 		return *this;
 	}
@@ -1666,10 +1666,10 @@ template <typename T> class Matrix4
 	{
 		for ( int i = 0; i < 4; ++i )
 		{
-			element( 0, i ) += mat.element( 0, i );
-			element( 1, i ) += mat.element( 1, i );
-			element( 2, i ) += mat.element( 2, i );
-			element( 3, i ) += mat.element( 3, i );
+			el( 0, i ) += mat.el( 0, i );
+			el( 1, i ) += mat.el( 1, i );
+			el( 2, i ) += mat.el( 2, i );
+			el( 3, i ) += mat.el( 3, i );
 		}
 		return *this;
 	}
@@ -2064,9 +2064,9 @@ template <typename T> class Quaternion
 
 	Quaternion Normalized() const
 	{
-		Quaternion q( *this );
-		q.Normalize();
-		return q;
+		Quaternion quat( *this );
+		quat.Normalize();
+		return quat;
 	}
 
 	bool Equals( const Quaternion& r, T tolerance ) const
@@ -2411,7 +2411,7 @@ template <typename T> inline Matrix4<T> FrustumInverse( T left, T right, T botto
 
 template <typename T> inline Matrix4<T> Perspective( T fovy, T aspect, T zNear, T zFar )
 {
-	T tangent = (T)tan( ToRadians( fovy / T( 2.0 ) ) );
+	T tangent = T( tan( ToRadians( fovy / T( 2.0 ) ) ) );
 	T y = tangent * zNear;
 	T x = aspect * y;
 	return Frustum( -x, x, -y, y, zNear, zFar );
@@ -2419,7 +2419,7 @@ template <typename T> inline Matrix4<T> Perspective( T fovy, T aspect, T zNear, 
 
 template <typename T> inline Matrix4<T> PerspectiveInverse( T fovy, T aspect, T zNear, T zFar )
 {
-	T tangent = (T)tan( ToRadians( fovy / T( 2.0 ) ) );
+	T tangent = T( tan( ToRadians( fovy / T( 2.0 ) ) ) );
 	T y = tangent * zNear;
 	T x = aspect * y;
 	return FrustumInverse( -x, x, -y, y, zNear, zFar );

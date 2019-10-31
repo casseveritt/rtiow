@@ -15,6 +15,9 @@
 
 using namespace r3;
 
+namespace
+{
+
 Vec3f EnvColor( const Vec3f& dir )
 {
 	Vec3f unit = dir.Normalized();
@@ -66,6 +69,8 @@ Vec3f GammaFromLinear( const Vec3f& col )
 {
 	return Vec3f( pow( col.x, 1 / 2.2 ), pow( col.y, 1 / 2.2 ), pow( col.z, 1 / 2.2 ) );
 }
+
+} // namespace (anon)
 
 int main( int argc, char** argv )
 {
