@@ -15,6 +15,8 @@
 
 using namespace r3;
 
+int trace_recursion = 0;
+
 namespace
 {
 
@@ -33,23 +35,32 @@ struct TraceResult
 	Vec3f Color;
 };
 
-TraceResult TraceRay( const Vec3f& attenuation, const Ray& ray, Hitable* hitable )
+struct ScopedRefCount
 {
+	ScopedRefCount( int & refcount ) : rc( refcount ) { rc++; }
+	~ScopedRefCount() { rc--; }
+	int & rc;
+};
+
+TraceResult TraceRay( const Vec3f& attenuation, const Ray& ray, Hitable* hitable, int depth = 0 )
+{
+	ScopedRefCount src( trace_recursion );
+
 	// if "fully" attenuated, give up
-	if ( attenuation.Dot( attenuation ) < 0.001 )
+	if ( depth > 50 || attenuation.Dot( attenuation ) < 0.001 )
 	{
 		return TraceResult( Vec3f( 0, 0, 0 ) );
 	}
 
 	Hit hit;
-	if ( hitable->Hits( ray, hit ) )
+	if ( hitable->Hits( ray, 0.001, hit ) )
 	{
 		Ray scatter;
 		Vec3f atten;
 		if ( hit.mat->Scatter( ray, hit, atten, scatter ) )
 		{
 			// cast a scattering ray, accumulating attenuation
-			return TraceRay( atten * attenuation, scatter, hitable );
+			return TraceRay( atten * attenuation, scatter, hitable, depth + 1 );
 		}
 		else
 		{
@@ -91,12 +102,14 @@ int main( int argc, char** argv )
 	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
 	Sphere gold_sphere( Vec3f( 1, 0, -1 ), 0.5, &metal_gold );
 	Sphere diel_yellow_sphere( Vec3f( -1, 0, -1 ), 0.5, &diel_yellow );
+	Sphere diel_yellow_sphere2( Vec3f( -1, 0, -1 ), -0.45, &diel_yellow );
 
 	HitableCollection collection;
 	collection.hitables.push_back( &blue_sphere );
 	collection.hitables.push_back( &ground_sphere );
 	collection.hitables.push_back( &gold_sphere );
 	collection.hitables.push_back( &diel_yellow_sphere );
+	collection.hitables.push_back( &diel_yellow_sphere2 );
 
 	Camera cam( 90, 2 );
 
