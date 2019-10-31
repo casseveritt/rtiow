@@ -20,8 +20,7 @@ namespace
 
 Vec3f EnvColor( const Vec3f& dir )
 {
-	Vec3f unit = dir.Normalized();
-	float t = 0.5f * ( unit.y + 1.0f );
+	float t = 0.5f * dir.y + 0.5f;
 	return r3::Lerp( Vec3f( 1, 1, 1 ), Vec3f( 0.5f, 0.7f, 1.0f ), t );
 }
 
