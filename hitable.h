@@ -10,6 +10,7 @@ struct Material;
 struct Hit
 {
 	typedef r3::Vec3f V;
+	Hit() : t( 0 ), mat( nullptr ) {}
 	float t;
 	V p;
 	V n;

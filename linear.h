@@ -202,11 +202,7 @@ template <class T> struct Vec2
 
 	Vec2& operator/=( T d )
 	{
-		if ( d == 0 )
-			return *this;
-		for ( int i = 0; i < N; i++ )
-			v[ i ] /= d;
-		return *this;
+		return *this *= ( T( 1 ) / d );
 	}
 
 	Vec2& operator+=( const Vec2& u )
@@ -474,13 +470,7 @@ template <typename T> class Vec3
 
 	Vec3& operator/=( T d )
 	{
-		if ( d < R3_ZERO )
-			return *this;
-		for ( int i = 0; i < N; i++ )
-		{
-			v[ i ] /= d;
-		}
-		return *this;
+		return *this *= ( T( 1 ) / d );
 	}
 
 	Vec3& operator+=( T d )
@@ -761,13 +751,7 @@ template <typename T> class Vec4
 
 	Vec4& operator/=( T d )
 	{
-		if ( d == 0 )
-			return *this;
-		for ( int i = 0; i < N; i++ )
-		{
-			v[ i ] /= d;
-		}
-		return *this;
+		return *this *= ( T( 1 ) / d );
 	}
 
 	Vec4& operator+=( const Vec4& u )

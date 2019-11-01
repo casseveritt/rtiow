@@ -95,21 +95,28 @@ int main( int argc, char** argv )
 	Lambertian lamb_blue( Vec3f( 0.1f, 0.2f, 0.5f ) );
 	Lambertian lamb_greenish( Vec3f( 0.8f, 0.8f, 0.0f ) );
 	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ), 0.3 );
-	// Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
+	Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
 	Dielectric diel_yellow( 1.5f );
+	Dielectric diel_yellow2( 0.667f );
 
-	Sphere blue_sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_blue );
+	Sphere blue_sphere( Vec3f( -1, 0, -1.5 ), 0.45, &lamb_blue );
+	Sphere blue_sphere2( Vec3f( 1, 0, -1.5 ), 0.45, &lamb_blue );
 	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
 	Sphere gold_sphere( Vec3f( 1, 0, -1 ), 0.5, &metal_gold );
-	Sphere diel_yellow_sphere( Vec3f( -1, 0, -1 ), 0.5, &diel_yellow );
-	Sphere diel_yellow_sphere2( Vec3f( -1, 0, -1 ), -0.45, &diel_yellow );
+	Sphere diel_yellow_sphere( Vec3f(  -1, 0, -1.5 ), 1.0, &diel_yellow );
+	Sphere diel_yellow_sphere2( Vec3f( -1, 0, -1.5 ), 0.95, &diel_yellow2 );
+	Sphere diel_yellow_sphereb( Vec3f(  1, 0, -1.5 ), 1.0, &diel_yellow );
+	Sphere diel_yellow_sphereb2( Vec3f(  1, 0, -1.5 ), -0.95, &diel_yellow );
 
 	HitableCollection collection;
-	collection.hitables.push_back( &blue_sphere );
 	collection.hitables.push_back( &ground_sphere );
-	collection.hitables.push_back( &gold_sphere );
+	collection.hitables.push_back( &blue_sphere );
+	collection.hitables.push_back( &blue_sphere2 );
+	//collection.hitables.push_back( &gold_sphere );
 	collection.hitables.push_back( &diel_yellow_sphere );
 	collection.hitables.push_back( &diel_yellow_sphere2 );
+	collection.hitables.push_back( &diel_yellow_sphereb );
+	collection.hitables.push_back( &diel_yellow_sphereb2 );
 
 	Camera cam( 90 /* fovy degrees */, 2 /* aspect ratio */ );
 

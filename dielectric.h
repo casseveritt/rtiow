@@ -48,7 +48,7 @@ struct Dielectric : public Material
 			if ( RandomScalar() > refl_prob )
 			{
 				scattered = Ray( hit.p, refr );
-				attenuation = V( 1, 1, 1 );
+				attenuation = nr < 1 ? V( .9, .9, .9 ) : V( 1, 1, 1 );
 				return true;
 			}
 		}
