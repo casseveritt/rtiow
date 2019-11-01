@@ -674,7 +674,7 @@ template <typename T> class Vec4
 		return T( sqrt( r ) );
 	}
 
-	T SquareNorm() const
+	T LengthSquared() const
 	{
 		T r = 0;
 		for ( int i = 0; i < N; i++ )
@@ -1936,9 +1936,9 @@ template <typename T> class Quaternion
 
 	Quaternion& SetValue( const Vec3<T>& axis, T theta )
 	{
-		T sqnorm = axis.SquareNorm();
+		T lensquared = axis.LengthSquared();
 
-		if ( sqnorm <= R3_EPSILON )
+		if ( lensquared <= T( R3_EPSILON ) )
 		{
 			// axis too small.
 			x = y = z = 0.0;
@@ -1949,9 +1949,9 @@ template <typename T> class Quaternion
 			theta *= T( 0.5 );
 			T sin_theta = T( sin( theta ) );
 
-			if ( !Equivalent( sqnorm, R3_ONE ) )
+			if ( !Equivalent( lensquared, T( R3_ONE ) ) )
 			{
-				sin_theta /= T( sqrt( sqnorm ) );
+				sin_theta /= T( sqrt( lensquared ) );
 			}
 			x = sin_theta * axis.x;
 			y = sin_theta * axis.y;
@@ -1973,14 +1973,14 @@ template <typename T> class Quaternion
 
 		alpha = p1.Dot( p2 );
 
-		if ( GreaterThan( alpha, R3_ONE ) )
+		if ( GreaterThan( alpha, T( R3_ONE ) ) )
 		{
 			*this = Identity();
 			return *this;
 		}
 
 		// ensures that the anti-parallel case leads to a positive dot
-		if ( LessThan( alpha, -R3_ONE ) )
+		if ( LessThan( alpha, T( -R3_ONE ) ) )
 		{
 			Vec3<T> v;
 
@@ -2425,6 +2425,39 @@ template <typename T> inline Matrix4<T> OrthoInverse( T left, T right, T bottom,
 	return m.Inverse();
 }
 
+template <typename T> struct Pose
+{
+	typedef T ElementType;
+	typedef Quaternion<T> Q;
+	typedef Vec3<T> V;
+	Q r;
+	V t;
+
+	Pose() {}
+
+	Pose( const Q& rotation, const V& translation )
+	{
+		SetValue( rotation, translation );
+	}
+
+	void SetValue( const Q& rotation, const V& translation )
+	{
+		r = rotation;
+		t = translation;
+	}
+
+	void SetValue( const V& from, const V& to, const V& up )
+	{
+		t = from;
+
+		V look = ( to - from ).Normalized();
+		V u = ( up - look * Dot( look, up ) ).Normalized();
+
+		// -Z is the canonical fwd vector, and +Y is the canonical up vector
+		r.SetValue( V( 0, 0, -1 ), V( 0, 1, 0 ), look, u );
+	}
+};
+
 // make common typedefs...
 typedef Vec2<int> Vec2i;
 typedef Vec2<float> Vec2f;
@@ -2451,5 +2484,7 @@ typedef Matrix3<double> Matrix3d;
 typedef Matrix3<int> Matrix3i;
 typedef Matrix4<float> Matrix4f;
 typedef Matrix4<double> Matrix4d;
+typedef Pose<float> Posef;
+typedef Pose<double> Posed;
 
 } // namespace r3
