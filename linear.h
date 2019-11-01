@@ -2105,6 +2105,13 @@ template <typename T> class Quaternion
 		MultVec( Vec3<T>( src_and_dst ), src_and_dst );
 	}
 
+	Vec3<T> Rotate( const Vec3<T>& v ) const
+	{
+		Vec3<T> ret;
+		( *this ).MultVec( v, ret );
+		return ret;
+	}
+
 	void ScaleAngle( T scaleFactor )
 	{
 		Vec3<T> axis;

@@ -117,7 +117,13 @@ int main( int argc, char** argv )
 	collection.hitables.push_back( &diel_yellow_sphere );
 	collection.hitables.push_back( &diel_yellow_sphere2 );
 
-	Camera cam( 20, float( w ) / float( h ), Vec3f( -2, 2, 1 ), Vec3f( 0, 0, -1 ), Vec3f( 0, 1, 0 ) );
+	Camera cam;
+	cam.SetFov( 20, float( w ) / float( h ) );
+	Vec3f from( 3, 3, 2 );
+	Vec3f to( 0, 0, -1 );
+	Vec3f up( 0, 1, 0 );
+	cam.SetPose( from, to, up );
+	cam.SetFocus( 2.0f, ( to - from ).Length() );
 
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
