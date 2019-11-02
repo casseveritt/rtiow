@@ -86,44 +86,68 @@ Vec3f GammaFromLinear( const Vec3f& col )
 	return Vec3f( pow( col.x, 1 / 2.2 ), pow( col.y, 1 / 2.2 ), pow( col.z, 1 / 2.2 ) );
 }
 
+void random_scene( HitableCollection& collection )
+{
+	std::vector<Hitable*>& hc = collection.hitables;
+	hc.push_back( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( Vec3f( 0.5, 0.5, 0.5 ) ) ) );
+	int i = 1;
+	std::mt19937 gen( 0 );
+	std::uniform_real_distribution<> dis( 0.0, 1.0 );
+	for ( int a = -11; a < 11; a++ )
+	{
+		for ( int b = -11; b < 11; b++ )
+		{
+			float choose_mat = dis( gen );
+			Vec3f center( a + 0.9 * dis( gen ), 0.2, b + 0.9 * dis( gen ) );
+			if ( ( center - Vec3f( 4, 0.2, 0 ) ).Length() > 0.9 )
+			{
+				if ( choose_mat < 0.8 )
+				{ // diffuse
+					hc.push_back( new Sphere(
+						center, 0.2,
+						new Lambertian( Vec3f( dis( gen ) * dis( gen ), dis( gen ) * dis( gen ), dis( gen ) * dis( gen ) ) ) ) );
+				}
+				else if ( choose_mat < 0.95 )
+				{ // metal
+					hc.push_back( new Sphere(
+						center, 0.2,
+						new Metal( Vec3f( 0.5 * ( 1 + dis( gen ) ), 0.5 * ( 1 + dis( gen ) ), 0.5 * ( 1 + dis( gen ) ) ),
+								   0.5 * dis( gen ) ) ) );
+				}
+				else
+				{ // glass
+					hc.push_back( new Sphere( center, 0.2, new Dielectric( 1.5 ) ) );
+				}
+			}
+		}
+	}
+	hc.push_back( new Sphere( Vec3f( 0, 1, 0 ), 1.0, new Dielectric( 1.5 ) ) );
+	hc.push_back( new Sphere( Vec3f( -4, 1, 0 ), 1.0, new Lambertian( Vec3f( 0.4, 0.2, 0.1 ) ) ) );
+	hc.push_back( new Sphere( Vec3f( 4, 1, 0 ), 1.0, new Metal( Vec3f( 0.7, 0.6, 0.5 ), 0.0 ) ) );
+}
+
 } // namespace
 
 int main( int argc, char** argv )
 {
 
-	const int w = 400;
-	const int h = 200;
-	const int samples = 100;
+	const int w = 1200;
+	const int h = 800;
+	const int samples = 10;
 	char* img = new char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
 
-	Lambertian lamb_blue( Vec3f( 0.1f, 0.2f, 0.5f ) );
-	Lambertian lamb_greenish( Vec3f( 0.8f, 0.8f, 0.0f ) );
-	Metal metal_gold( Vec3f( 0.8, 0.6, 0.2 ), 0.3 );
-	// Metal metal_silver( Vec3f( 0.8, 0.8, 0.8 ), 0.1 );
-	Dielectric diel_yellow( 1.5f );
-
-	Sphere blue_sphere( Vec3f( 0, 0, -1 ), 0.5, &lamb_blue );
-	Sphere ground_sphere( Vec3f( 0, -100.5, -1 ), 100, &lamb_greenish );
-	Sphere gold_sphere( Vec3f( 1, 0, -1 ), 0.5, &metal_gold );
-	Sphere diel_yellow_sphere( Vec3f( -1, 0, -1 ), 0.5, &diel_yellow );
-	Sphere diel_yellow_sphere2( Vec3f( -1, 0, -1 ), -0.45, &diel_yellow );
-
 	HitableCollection collection;
-	collection.hitables.push_back( &blue_sphere );
-	collection.hitables.push_back( &ground_sphere );
-	collection.hitables.push_back( &gold_sphere );
-	collection.hitables.push_back( &diel_yellow_sphere );
-	collection.hitables.push_back( &diel_yellow_sphere2 );
+	random_scene( collection );
 
 	Camera cam;
 	cam.SetFov( 20, float( w ) / float( h ) );
-	Vec3f from( 3, 3, 2 );
-	Vec3f to( 0, 0, -1 );
+	Vec3f from( 13, 2, 3 );
+	Vec3f to( 0, 0, 0 );
 	Vec3f up( 0, 1, 0 );
 	cam.SetPose( from, to, up );
-	cam.SetFocus( 2.0f, ( to - from ).Length() );
+	cam.SetFocus( 0.1f, 10 );
 
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
