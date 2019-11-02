@@ -10,7 +10,7 @@ struct Material;
 struct Hit
 {
 	typedef r3::Vec3f V;
-	float t;
+	float s;
 	V p;
 	V n;
 	const Material* mat;
@@ -18,21 +18,21 @@ struct Hit
 
 struct Hitable
 {
-	virtual bool Hits( const Ray& ray, float t_min, Hit& hit ) = 0;
+	virtual bool Hits( const Ray& ray, float s_min, Hit& hit ) = 0;
 };
 
 struct HitableCollection : public Hitable
 {
 	std::vector<Hitable*> hitables;
 
-	bool Hits( const Ray& ray, float t_min, Hit& hit )
+	bool Hits( const Ray& ray, float s_min, Hit& hit )
 	{
 		bool has_hit = false;
 		Hit closest_hit;
 		for ( auto hitable : hitables )
 		{
 			Hit h;
-			if ( hitable->Hits( ray, t_min, h ) )
+			if ( hitable->Hits( ray, s_min, h ) )
 			{
 				if ( has_hit == false )
 				{
@@ -40,7 +40,7 @@ struct HitableCollection : public Hitable
 					has_hit = true;
 					continue;
 				}
-				if ( h.t < closest_hit.t )
+				if ( h.s < closest_hit.s )
 				{
 					closest_hit = h;
 				}

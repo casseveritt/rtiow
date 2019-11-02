@@ -6,23 +6,28 @@
 struct Sphere : public Hitable
 {
 	typedef r3::Vec3f V;
-	Sphere( const V& center, const float radius, Material* material ) : c( center ), r( radius ), mat( material ) {}
-
-	bool Hits( const Ray& ray, float t_min, Hit& hit )
+	Sphere( const V& center, const float radius, Material* material, const V& vel = V(), float time0 = 0 )
+		: c0( center ), r( radius ), mat( material ), dcdt( vel ), t0( time0 )
 	{
-		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, ray.o - c ), Dot( ray.o - c, ray.o - c ) - r * r );
+	}
+
+	bool Hits( const Ray& ray, float s_min, Hit& hit )
+	{
+		V c = c0 + dcdt * ( ray.t - t0 );
+		V oc = ray.o - c;
+		Quadraticf quadr( Dot( ray.dir, ray.dir ), 2 * Dot( ray.dir, oc ), Dot( oc, oc ) - r * r );
 		float discr = quadr.Discriminant();
 		if ( discr >= 0 )
 		{
-			float t = quadr.ClosestForwardSolution( discr, t_min );
-			if ( t < t_min )
+			float s = quadr.ClosestForwardSolution( discr, s_min );
+			if ( s < s_min )
 			{
 				return false;
 			}
 			else
 			{
-				hit.t = t;
-				hit.p = ray.At( t );
+				hit.s = s;
+				hit.p = ray.At( s );
 				hit.n = ( hit.p - c ) / r;
 				hit.mat = mat;
 				return true;
@@ -34,7 +39,9 @@ struct Sphere : public Hitable
 		}
 	}
 
-	V c;
+	V c0;
 	float r;
 	const Material* mat;
+	V dcdt;
+	float t0;
 };

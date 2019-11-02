@@ -8,20 +8,16 @@ extern int trace_recursion;
 struct Ray
 {
 	typedef r3::Vec3f V;
-	Ray() {}
-	Ray( const V& origin, const V& direction, float fwd = 0.0f ) : dir( direction.Normalized() ), o( origin + dir * fwd )
-	{
-		if ( trace_recursion > 100 )
-		{
-			printf( "%d ray: o = ( %.2f, %.2f, %.2f ), dir = ( %.2f, %.2f, %.2f )\n", trace_recursion, o.x, o.y, o.z, dir.x,
-					dir.y, dir.z );
-		}
-	}
 
-	V At( float t ) const
+	Ray() : t( 0 ) {}
+
+	Ray( const V& origin, const V& direction, float time = 0 ) : dir( direction.Normalized() ), o( origin ), t( time ) {}
+
+	V At( float s ) const
 	{
-		return o + dir * t;
+		return o + dir * s;
 	}
 	V dir;
 	V o;
+	float t;
 };

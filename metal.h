@@ -17,7 +17,7 @@ struct Metal : public Material
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
 		V refl = Reflect( incident.dir, hit.n ) + rpius.GetPoint() * fuzz;
-		scattered = Ray( hit.p, refl );
+		scattered = Ray( hit.p, refl, incident.t );
 		attenuation = albedo;
 		return true;
 	}

@@ -41,11 +41,11 @@ struct Dielectric : public Material
 		V refr;
 		if ( Refract( incident.dir, normal, nr, refr ) && RandomScalar() > Schlick( -incident.dir.Dot( normal ), nr ) )
 		{
-			scattered = Ray( hit.p, refr );
+			scattered = Ray( hit.p, refr, incident.t );
 		}
 		else
 		{
-			scattered = Ray( hit.p, Reflect( incident.dir, normal ) );
+			scattered = Ray( hit.p, Reflect( incident.dir, normal ), incident.t );
 		}
 		attenuation = V( 1, 1, 1 );
 		return true;

@@ -11,7 +11,7 @@ struct Camera
 	typedef r3::Posef Pose;
 
 	// symmetric fov
-	Camera() : gen( 0 ), dis( -1, 1 )
+	Camera() : gen( 0 ), dis( -1.0, 1.0 ), dis01( 0.0, 1.0 )
 	{
 		SetFov( 60, 1 );
 	}
@@ -34,11 +34,17 @@ struct Camera
 		focal_dist = focal_distance;
 	}
 
+	void SetExposure( float time0, float time1 )
+	{
+		t0 = time0;
+		t1 = time1;
+	}
+
 	Ray GetRay( const V2& uv )
 	{
 		V3 o = PointOnLens();
 		V3 target = V3( r3::Lerp( ll.x, ur.x, uv.x ), r3::Lerp( ll.y, ur.y, uv.y ), -1 ) * focal_dist;
-		return Ray( pose.t + pose.r.Rotate( o ), pose.r.Rotate( target - o ) );
+		return Ray( pose.t + pose.r.Rotate( o ), pose.r.Rotate( target - o ), r3::Lerp( t0, t1, Random0to1() ) );
 	}
 
 	V3 PointOnLens() const
@@ -52,11 +58,19 @@ struct Camera
 		return V3( p.x, p.y, 0 );
 	}
 
+	float Random0to1() const
+	{
+		return dis01( gen );
+	}
+
 	V2 ll;
 	V2 ur;
 	Pose pose;
 	float lens_radius = 0;
 	float focal_dist = 1;
+	float t0 = 0;
+	float t1 = 0;
 	mutable std::mt19937 gen;
 	mutable std::uniform_real_distribution<> dis;
+	mutable std::uniform_real_distribution<> dis01;
 };
