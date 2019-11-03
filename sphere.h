@@ -11,6 +11,16 @@ struct Sphere : public Hitable
 	{
 	}
 
+	Aabb GetBounds( float time0 = 0, float time1 = 0 ) const
+	{
+		V radiusVec( r, r, r );
+		V c_t0 = c0 + dcdt * time0;
+		V c_t1 = c0 + dcdt * time1;
+		V cmin = r3::Min( c_t0, c_t1 );
+		V cmax = r3::Max( c_t0, c_t1 );
+		return Aabb( cmin - radiusVec, cmax + radiusVec );
+	}
+
 	bool Hits( const Ray& ray, float s_min, Hit& hit )
 	{
 		V c = c0 + dcdt * ( ray.t - t0 );

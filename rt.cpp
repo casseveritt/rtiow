@@ -1,5 +1,6 @@
 
 
+#include "aabb.h"
 #include "camera.h"
 #include "dielectric.h"
 #include "lambertian.h"
@@ -86,10 +87,9 @@ Vec3f GammaFromLinear( const Vec3f& col )
 	return Vec3f( pow( col.x, 1 / 2.2 ), pow( col.y, 1 / 2.2 ), pow( col.z, 1 / 2.2 ) );
 }
 
-void random_scene( HitableCollection& collection )
+void random_scene( HitableCollection& hc )
 {
-	std::vector<Hitable*>& hc = collection.hitables;
-	hc.push_back( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( Vec3f( 0.5, 0.5, 0.5 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( Vec3f( 0.5, 0.5, 0.5 ) ) ) );
 	int i = 1;
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
@@ -103,14 +103,14 @@ void random_scene( HitableCollection& collection )
 			{
 				if ( choose_mat < 0.8 )
 				{ // diffuse
-					hc.push_back( new Sphere(
+					hc.Add( new Sphere(
 						center, 0.2,
 						new Lambertian( Vec3f( dis( gen ) * dis( gen ), dis( gen ) * dis( gen ), dis( gen ) * dis( gen ) ) ),
 						Vec3f( 0, 0.5 * dis( gen ), 0 ) ) );
 				}
 				else if ( choose_mat < 0.95 )
 				{ // metal
-					hc.push_back( new Sphere(
+					hc.Add( new Sphere(
 						center, 0.2,
 						new Metal( Vec3f( 0.5 * ( 1 + dis( gen ) ), 0.5 * ( 1 + dis( gen ) ), 0.5 * ( 1 + dis( gen ) ) ),
 								   0.5 * dis( gen ) ),
@@ -118,14 +118,14 @@ void random_scene( HitableCollection& collection )
 				}
 				else
 				{ // glass
-					hc.push_back( new Sphere( center, 0.2, new Dielectric( 1.5 ), Vec3f( 0, 0.5 * dis( gen ), 0 ) ) );
+					hc.Add( new Sphere( center, 0.2, new Dielectric( 1.5 ), Vec3f( 0, 0.5 * dis( gen ), 0 ) ) );
 				}
 			}
 		}
 	}
-	hc.push_back( new Sphere( Vec3f( 0, 1, 0 ), 1.0, new Dielectric( 1.5 ) ) );
-	hc.push_back( new Sphere( Vec3f( -4, 1, 0 ), 1.0, new Lambertian( Vec3f( 0.4, 0.2, 0.1 ) ) ) );
-	hc.push_back( new Sphere( Vec3f( 4, 1, 0 ), 1.0, new Metal( Vec3f( 0.7, 0.6, 0.5 ), 0.0 ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 1, 0 ), 1.0, new Dielectric( 1.5 ) ) );
+	hc.Add( new Sphere( Vec3f( -4, 1, 0 ), 1.0, new Lambertian( Vec3f( 0.4, 0.2, 0.1 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 4, 1, 0 ), 1.0, new Metal( Vec3f( 0.7, 0.6, 0.5 ), 0.0 ) ) );
 }
 
 } // namespace
@@ -149,8 +149,10 @@ int main( int argc, char** argv )
 	Vec3f to( 0, 0, 0 );
 	Vec3f up( 0, 1, 0 );
 	cam.SetPose( from, to, up );
-	cam.SetFocus( 0.0f, 10 );
-	cam.SetExposure( 0, 1 );
+	cam.SetFocus( 0.1f, 10 );
+	cam.SetExposure( 0, 0 );
+
+	collection.BuildBvh( cam.t0, cam.t1 );
 
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
