@@ -92,7 +92,6 @@ void random_scene( HitableCollection& hc )
 	CheckerTexture* checker =
 		new CheckerTexture( new ConstantTexture( Vec3f( 0.2, 0.3, 0.1 ) ), new ConstantTexture( Vec3f( 0.9, 0.9, 0.9 ) ) );
 	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( checker ) ) );
-	int i = 1;
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
 	for ( int a = -11; a < 11; a++ )
@@ -130,6 +129,14 @@ void random_scene( HitableCollection& hc )
 	hc.Add( new Sphere( Vec3f( 4, 1, 0 ), 1.0, new Metal( Vec3f( 0.7, 0.6, 0.5 ), 0.0 ) ) );
 }
 
+void two_spheres_scene( HitableCollection& hc )
+{
+	CheckerTexture* checker =
+		new CheckerTexture( new ConstantTexture( Vec3f( 0.2, 0.3, 0.1 ) ), new ConstantTexture( Vec3f( 0.9, 0.9, 0.9 ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 10, 0 ), 10, new Lambertian( checker ) ) );
+	hc.Add( new Sphere( Vec3f( 0, -10, 0 ), 10, new Lambertian( checker ) ) );
+}
+
 } // namespace
 
 int main( int argc, char** argv )
@@ -143,7 +150,8 @@ int main( int argc, char** argv )
 	Vec3f origin( 0, 0, 0 );
 
 	HitableCollection collection;
-	random_scene( collection );
+	// random_scene( collection );
+	two_spheres_scene( collection );
 
 	Camera cam;
 	cam.SetFov( 20, float( w ) / float( h ) );
