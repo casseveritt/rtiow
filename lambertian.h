@@ -1,18 +1,24 @@
 #pragma once
 
 #include "material.h"
+#include "texture.h"
 #include <random>
 
 struct Lambertian : public Material
 {
 	typedef r3::Vec3f V;
+	typedef r3::Vec2f V2;
 
-	Lambertian( const V& albdo ) : albedo( albdo ) {}
+	Lambertian( Texture* albdo ) : albedo( albdo ) {}
+	~Lambertian()
+	{
+		delete albedo;
+	}
 
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
 		scattered = Ray( hit.p, hit.n + rpius.GetPoint(), incident.t );
-		attenuation = albedo;
+		attenuation = albedo->Value( V2(), hit.p );
 		return true;
 	}
 
@@ -35,5 +41,5 @@ struct Lambertian : public Material
 	};
 
 	mutable RandomPointInUnitSphere rpius;
-	V albedo;
+	Texture* albedo;
 };

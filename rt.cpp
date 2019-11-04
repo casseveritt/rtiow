@@ -89,7 +89,9 @@ Vec3f GammaFromLinear( const Vec3f& col )
 
 void random_scene( HitableCollection& hc )
 {
-	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( Vec3f( 0.5, 0.5, 0.5 ) ) ) );
+	CheckerTexture* checker =
+		new CheckerTexture( new ConstantTexture( Vec3f( 0.2, 0.3, 0.1 ) ), new ConstantTexture( Vec3f( 0.9, 0.9, 0.9 ) ) );
+	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( checker ) ) );
 	int i = 1;
 	std::mt19937 gen( 0 );
 	std::uniform_real_distribution<> dis( 0.0, 1.0 );
@@ -103,10 +105,10 @@ void random_scene( HitableCollection& hc )
 			{
 				if ( choose_mat < 0.8 )
 				{ // diffuse
-					hc.Add( new Sphere(
-						center, 0.2,
-						new Lambertian( Vec3f( dis( gen ) * dis( gen ), dis( gen ) * dis( gen ), dis( gen ) * dis( gen ) ) ),
-						Vec3f( 0, 0.5 * dis( gen ), 0 ) ) );
+					hc.Add( new Sphere( center, 0.2,
+										new Lambertian( new ConstantTexture( Vec3f(
+											dis( gen ) * dis( gen ), dis( gen ) * dis( gen ), dis( gen ) * dis( gen ) ) ) ),
+										Vec3f( 0, 0.5 * dis( gen ), 0 ) ) );
 				}
 				else if ( choose_mat < 0.95 )
 				{ // metal
@@ -124,7 +126,7 @@ void random_scene( HitableCollection& hc )
 		}
 	}
 	hc.Add( new Sphere( Vec3f( 0, 1, 0 ), 1.0, new Dielectric( 1.5 ) ) );
-	hc.Add( new Sphere( Vec3f( -4, 1, 0 ), 1.0, new Lambertian( Vec3f( 0.4, 0.2, 0.1 ) ) ) );
+	hc.Add( new Sphere( Vec3f( -4, 1, 0 ), 1.0, new Lambertian( new ConstantTexture( Vec3f( 0.4, 0.2, 0.1 ) ) ) ) );
 	hc.Add( new Sphere( Vec3f( 4, 1, 0 ), 1.0, new Metal( Vec3f( 0.7, 0.6, 0.5 ), 0.0 ) ) );
 }
 
@@ -135,7 +137,7 @@ int main( int argc, char** argv )
 
 	const int w = 1200;
 	const int h = 800;
-	const int samples = 10;
+	const int samples = 20;
 	char* img = new char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
