@@ -132,8 +132,8 @@ void random_scene( HitableCollection& hc )
 
 void two_spheres_scene( HitableCollection& hc )
 {
-	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new Turbulence( 6 ) ) ) );
-	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Turbulence( 6 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new Marble( 6 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Marble( 6 ) ) ) );
 }
 
 } // namespace
