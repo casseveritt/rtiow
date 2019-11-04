@@ -5,6 +5,7 @@
 #include "dielectric.h"
 #include "lambertian.h"
 #include "metal.h"
+#include "noise.h"
 #include "sphere.h"
 
 #include <limits>
@@ -131,10 +132,8 @@ void random_scene( HitableCollection& hc )
 
 void two_spheres_scene( HitableCollection& hc )
 {
-	CheckerTexture* checker =
-		new CheckerTexture( new ConstantTexture( Vec3f( 0.2, 0.3, 0.1 ) ), new ConstantTexture( Vec3f( 0.9, 0.9, 0.9 ) ) );
-	hc.Add( new Sphere( Vec3f( 0, 10, 0 ), 10, new Lambertian( checker ) ) );
-	hc.Add( new Sphere( Vec3f( 0, -10, 0 ), 10, new Lambertian( checker ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new Noise( 6 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Noise( 6 ) ) ) );
 }
 
 } // namespace
@@ -159,7 +158,7 @@ int main( int argc, char** argv )
 	Vec3f to( 0, 0, 0 );
 	Vec3f up( 0, 1, 0 );
 	cam.SetPose( from, to, up );
-	cam.SetFocus( 0.1f, 10 );
+	cam.SetFocus( 0.05f, 10 );
 	cam.SetExposure( 0, 0 );
 
 	collection.BuildBvh( cam.t0, cam.t1 );
