@@ -10,7 +10,7 @@ struct Perlin
 
 	static constexpr int Size = 256;
 
-	float scl;
+	float scale;
 	int permx[ Size ];
 	int permy[ Size ];
 	int permz[ Size ];
@@ -29,7 +29,7 @@ struct Perlin
 		}
 	}
 
-	Perlin( float scale ) : scl( scale )
+	Perlin( float p_scale ) : scale( p_scale )
 	{
 		std::mt19937 gen( 0 );
 		std::uniform_real_distribution<> dis( 0.0, 1.0 );
@@ -47,7 +47,7 @@ struct Perlin
 
 	float Noise( const V& pos ) const
 	{
-		V p = pos * scl;
+		V p = pos * scale;
 		V ijk( floor( p.x ), floor( p.y ), floor( p.z ) );
 		V uvw = p - ijk;
 		V huvw = uvw * uvw * ( V( 3, 3, 3 ) - 2 * uvw );
