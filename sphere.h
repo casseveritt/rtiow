@@ -6,6 +6,7 @@
 struct Sphere : public Hitable
 {
 	typedef r3::Vec3f V;
+	typedef r3::Vec2f V2;
 	Sphere( const V& center, const float radius, Material* material, const V& vel = V(), float time0 = 0 )
 		: c0( center ), r( radius ), mat( material ), dcdt( vel ), t0( time0 )
 	{
@@ -19,6 +20,14 @@ struct Sphere : public Hitable
 		V cmin = r3::Min( c_t0, c_t1 );
 		V cmax = r3::Max( c_t0, c_t1 );
 		return Aabb( cmin - radiusVec, cmax + radiusVec );
+	}
+
+	V2 UvFromHitPoint( const V& p )
+	{
+		V2 uv;
+		uv.x = 1 - ( atan2( p.z, p.x ) + M_PI ) / ( 2 * M_PI );
+		uv.y = ( asin( p.y ) + M_PI / 2 ) / M_PI;
+		return uv;
 	}
 
 	bool Hits( const Ray& ray, float s_min, Hit& hit )
@@ -39,6 +48,7 @@ struct Sphere : public Hitable
 				hit.s = s;
 				hit.p = ray.At( s );
 				hit.n = ( hit.p - c ) / r;
+				hit.uv = UvFromHitPoint( hit.n );
 				hit.mat = mat;
 				return true;
 			}

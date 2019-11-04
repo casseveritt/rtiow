@@ -3,17 +3,17 @@
 #include "aabb.h"
 #include "camera.h"
 #include "dielectric.h"
+#include "image_texture.h"
 #include "lambertian.h"
 #include "metal.h"
 #include "noise.h"
 #include "sphere.h"
 
+#include "stb.h"
+
 #include <limits>
 #include <random>
 #include <stdio.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
 
 using namespace r3;
 
@@ -132,7 +132,7 @@ void random_scene( HitableCollection& hc )
 
 void two_spheres_scene( HitableCollection& hc )
 {
-	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new Marble( 6 ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new ImageTexture( "earthmap.jpg" ) ) ) );
 	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Marble( 6 ) ) ) );
 }
 
@@ -144,7 +144,7 @@ int main( int argc, char** argv )
 	const int w = 1200;
 	const int h = 800;
 	const int samples = 20;
-	char* img = new char[ w * h * 3 ];
+	unsigned char* img = new unsigned char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
 
@@ -155,7 +155,7 @@ int main( int argc, char** argv )
 	Camera cam;
 	cam.SetFov( 20, float( w ) / float( h ) );
 	Vec3f from( 13, 2, 3 );
-	Vec3f to( 0, 0, 0 );
+	Vec3f to( 0, 2, 0 );
 	Vec3f up( 0, 1, 0 );
 	cam.SetPose( from, to, up );
 	cam.SetFocus( 0.05f, 10 );
@@ -198,7 +198,7 @@ int main( int argc, char** argv )
 		}
 	}
 
-	stbi_write_png( "out.png", w, h, 3, img, 0 );
+	image_store_png( "out.png", w, h, 3, img );
 
 	delete[] img;
 

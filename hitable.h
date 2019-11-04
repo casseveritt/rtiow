@@ -12,9 +12,11 @@ struct Material;
 struct Hit
 {
 	typedef r3::Vec3f V;
+	typedef r3::Vec2f V2;
 	float s;
 	V p;
 	V n;
+	V2 uv;
 	const Material* mat;
 };
 

@@ -18,7 +18,7 @@ struct Lambertian : public Material
 	bool Scatter( const Ray& incident, const Hit& hit, V& attenuation, Ray& scattered ) const
 	{
 		scattered = Ray( hit.p, hit.n + rpius.GetPoint(), incident.t );
-		attenuation = albedo->Value( V2(), hit.p );
+		attenuation = albedo->Value( hit.uv, hit.p );
 		return true;
 	}
 
