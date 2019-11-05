@@ -3,6 +3,7 @@
 #include "aabb.h"
 #include "camera.h"
 #include "dielectric.h"
+#include "diffuse_light.h"
 #include "image_texture.h"
 #include "lambertian.h"
 #include "metal.h"
@@ -65,21 +66,22 @@ TraceResult TraceRay( const Vec3f& attenuation, const Ray& ray, Hitable* hitable
 	{
 		Ray scatter;
 		Vec3f atten;
+		Vec3f emission = hit.mat->Emitted( hit.uv, hit.p );
 		if ( hit.mat->Scatter( ray, hit, atten, scatter ) )
 		{
 			// cast a scattering ray, accumulating attenuation
-			return TraceRay( atten * attenuation, scatter, hitable, depth + 1 );
+			return TraceRay( emission + atten * attenuation, scatter, hitable, depth + 1 );
 		}
 		else
 		{
 			// scatter failed, give up on ray
-			return TraceResult();
+			return TraceResult( emission );
 		}
 	}
 	else
 	{
-		// hit the environment
-		return TraceResult( attenuation * EnvColor( ray.dir ) );
+		// environment
+		return TraceResult( Vec3f( 0, 0, 0 ) );
 	}
 }
 
@@ -132,7 +134,7 @@ void random_scene( HitableCollection& hc )
 
 void two_spheres_scene( HitableCollection& hc )
 {
-	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new ImageTexture( "earthmap.jpg" ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new DiffuseLight( new ImageTexture( "earthmap.jpg" ) ) ) );
 	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Marble( 6 ) ) ) );
 }
 
