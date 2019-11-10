@@ -9,6 +9,7 @@
 #include "metal.h"
 #include "noise.h"
 #include "sphere.h"
+#include "rect.h"
 
 #include "stb.h"
 
@@ -134,8 +135,11 @@ void random_scene( HitableCollection& hc )
 
 void two_spheres_scene( HitableCollection& hc )
 {
-	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new DiffuseLight( new ImageTexture( "earthmap.jpg" ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 7, 0 ), 2, new DiffuseLight( new ConstantTexture( Vec3f( 4, 4, 4 ) ) ) ) );
+	hc.Add( new Sphere( Vec3f( 0, 2, 0 ), 2, new Lambertian( new Marble( 6 ) ) ) );
 	hc.Add( new Sphere( Vec3f( 0, -1000, 0 ), 1000, new Lambertian( new Marble( 6 ) ) ) );
+	hc.Add( new Rect( Vec2f( 0, 0 ), Vec2f( 2, 2 ), Posef( Rotationf(), Vec3f( 3, 1, -2 ) ),
+					  new DiffuseLight( new ConstantTexture( Vec3f( 4, 4, 4 ) ) ) ) );
 }
 
 } // namespace
@@ -143,9 +147,9 @@ void two_spheres_scene( HitableCollection& hc )
 int main( int argc, char** argv )
 {
 
-	const int w = 1200;
-	const int h = 800;
-	const int samples = 20;
+	const int w = 800;
+	const int h = 400;
+	const int samples = 400;
 	unsigned char* img = new unsigned char[ w * h * 3 ];
 
 	Vec3f origin( 0, 0, 0 );
@@ -155,7 +159,7 @@ int main( int argc, char** argv )
 	two_spheres_scene( collection );
 
 	Camera cam;
-	cam.SetFov( 20, float( w ) / float( h ) );
+	cam.SetFov( 30, float( w ) / float( h ) );
 	Vec3f from( 13, 2, 3 );
 	Vec3f to( 0, 2, 0 );
 	Vec3f up( 0, 1, 0 );
@@ -192,7 +196,7 @@ int main( int argc, char** argv )
 				}
 			}
 			col /= s;
-			col = GammaFromLinear( col );
+			col = r3::Min( GammaFromLinear( col ), Vec3f( 1, 1, 1 ) );
 			int idx = ( j * w + i ) * 3;
 			img[ idx + 0 ] = int( 255 * col.x + 0.5f );
 			img[ idx + 1 ] = int( 255 * col.y + 0.5f );

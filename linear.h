@@ -1100,7 +1100,7 @@ template <typename T> class Matrix3
 	}
 
 	// Cramer's Rule
-	Matrix3 Inverse() const
+	Matrix3 Inverted() const
 	{
 		Matrix3 m3 = Adjugate();
 		m3.Div( Determinant() );
@@ -1346,7 +1346,7 @@ template <typename T> class Matrix4
 		return v;
 	}
 
-	Matrix4 Inverse() const
+	Matrix4 Inverted() const
 	{
 		Matrix4 minv;
 
@@ -2079,7 +2079,7 @@ template <typename T> class Quaternion
 		return Conjugate();
 	}
 
-	Quaternion Inverse() const
+	Quaternion Inverted() const
 	{
 		Quaternion r = *this;
 		return r.Invert();
@@ -2270,7 +2270,7 @@ template <typename T> class Plane
 
 	void Transform( const Matrix4<T>& matrix )
 	{
-		Matrix4<T> invtr = matrix.Inverse();
+		Matrix4<T> invtr = matrix.Inverted();
 		invtr = invtr.Transpose();
 
 		Vec3<T> pntOnPlane = planenormal * planedistance;
@@ -2380,7 +2380,7 @@ template <typename T> inline Matrix4<T> Frustum( T left, T right, T bottom, T to
 	return m;
 }
 
-template <typename T> inline Matrix4<T> FrustumInverse( T left, T right, T bottom, T top, T zNear, T zFar )
+template <typename T> inline Matrix4<T> FrustumInverted( T left, T right, T bottom, T top, T zNear, T zFar )
 {
 	Matrix4<T> m;
 	m.MakeIdentity();
@@ -2408,12 +2408,12 @@ template <typename T> inline Matrix4<T> Perspective( T fovy, T aspect, T zNear, 
 	return Frustum( -x, x, -y, y, zNear, zFar );
 }
 
-template <typename T> inline Matrix4<T> PerspectiveInverse( T fovy, T aspect, T zNear, T zFar )
+template <typename T> inline Matrix4<T> PerspectiveInverted( T fovy, T aspect, T zNear, T zFar )
 {
 	T tangent = T( tan( ToRadians( fovy / T( 2.0 ) ) ) );
 	T y = tangent * zNear;
 	T x = aspect * y;
-	return FrustumInverse( -x, x, -y, y, zNear, zFar );
+	return FrustumInverted( -x, x, -y, y, zNear, zFar );
 }
 
 template <typename T> inline Matrix4<T> Ortho( T left, T right, T bottom, T top, T zNear, T zFar )
@@ -2425,11 +2425,11 @@ template <typename T> inline Matrix4<T> Ortho( T left, T right, T bottom, T top,
 	return m;
 }
 
-template <typename T> inline Matrix4<T> OrthoInverse( T left, T right, T bottom, T top, T zNear, T zFar )
+template <typename T> inline Matrix4<T> OrthoInverted( T left, T right, T bottom, T top, T zNear, T zFar )
 {
 	// could be done with a formula, but I'm being lazy
 	Matrix4<T> m = Ortho( left, right, bottom, top, zNear, zFar );
-	return m.Inverse();
+	return m.Inverted();
 }
 
 template <typename T> struct Pose
@@ -2463,6 +2463,18 @@ template <typename T> struct Pose
 		// -Z is the canonical fwd vector, and +Y is the canonical up vector
 		r.SetValue( V( 0, 0, -1 ), V( 0, 1, 0 ), look, u );
 	}
+
+	V Transform( const V& pos ) const
+	{
+		return t + r.Rotate( pos );
+	}
+
+	Pose Inverted() const
+	{
+		Q ir = r.Inverted();
+		return Pose( ir, ir.Rotate( -t ) );
+	}
+
 };
 
 // make common typedefs...

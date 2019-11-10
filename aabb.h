@@ -47,7 +47,7 @@ struct Aabb
 		float s0 = std::max( sx0, std::max( sy0, sz0 ) );
 		float s1 = std::min( sx1, std::min( sy1, sz1 ) );
 		const float diff = s1 - s0;
-		return ( s0 < s1 ) || ( diff != diff ); // true if diff is NaN
+		return ( s0 <= s1 ) || ( diff != diff ); // true if diff is NaN
 	}
 };
 
