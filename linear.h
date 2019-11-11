@@ -2442,6 +2442,8 @@ template <typename T> struct Pose
 
 	Pose() {}
 
+	Pose( const Pose & p ) : r( p.r ), t( p.t ) {}
+
 	Pose( const Q& rotation, const V& translation )
 	{
 		SetValue( rotation, translation );
